@@ -1,0 +1,30 @@
+{
+    "objective": {
+        "costs": [130, 100],
+        "optmimization": "MAX"
+    },
+    "constraints": [
+        {
+            "coefficients": [1.5, 1],
+            "constant": 27,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [1, 1],
+            "constant": 21,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [0.3, 0.5],
+            "constant": 9,
+            "type": "LEQ"
+        }
+    ],
+    "non-negatives": [0, 1],
+    "standard": [
+        [-130, -100, 0, 0, 0, 0],
+        [1.5, 1, 1, 0, 0, 27],
+        [1, 1, 0, 1, 0, 21],
+        [0.3, 0.5, 0, 0, 1, 9]
+    ]
+}
