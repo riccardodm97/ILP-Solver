@@ -11,24 +11,28 @@ class SupportData:
         self.out_base = []
         self.carry = self.carry(num_rows)
 
-    class Carry: 
+class Carry:
+    
+    def __init__(self, num_rows):
+        self.matrix = np.zeros((num_rows+1,num_rows+1))
+        self.y = self.matrix[0,:-1]
+        self.z = self.matrix[0,-1]   
+        self.inverse_matrix = self.matrix[1:,:-1]   
+        self.xb = self.matrix[1:,-1]
+
+    def set_y(self, y):
+        self.matrix[0,:-1] = y
         
-        def __init__(self, num_rows):
+    def set_xb(self, xb):
+        self.matrix[1:,-1] = xb
 
-            self.matrix = np.zeros((num_rows+1,num_rows+1))
-            self.y = self.matrix[0,:-1]
-            self.z = self.matrix[0,-1]   
-            self.inverse_matrix = self.matrix[1:,:-1]   
-            self.xb = self.matrix[1:,-1]
+    def set_z(self, z):
+        self.matrix[0,-1] = z
+        self.z = z
 
-        def set_y():
-            
-        def set_xb():
-
-        def set_z():
-
-        def set_inverse_matrix():
-        
+    def set_inverse_matrix(self, inverse_matrix):
+        self.matrix[1:,:-1] = inverse_matrix
+    
 
 def find_initial_basis(A):
     
