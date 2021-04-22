@@ -50,6 +50,7 @@ def compute_out_of_base(data):
 def create_artificial_problem(data):
 
     data_f1= SupportData(cose)  #TODO: cose non so in che modo partendo da data
+    compute_out_of_base(data_f1)
     return data_f1
 
 def from_f1_to_f2(data_f1,data):
@@ -62,6 +63,7 @@ def start_simplex(data):
     base_indexes = find_initial_basis(data.A)
     data.in_base = base_indexes 
     compute_out_of_base(data)
+    data.set_inverse_matrix = np.identity(A.shape[0])
 
     if -1 in base_indexes:
         phase1(data)
@@ -78,5 +80,8 @@ def phase1(data):
 
 def phase2(data):
 
+    data.set_xb = np.dot(data.inverse_matrix,data.b)
+    data.set_y = np.dot(-data.c[data.in_base],data.inverse_matrix)
+    data.set_z= np.dot(data.y,data.b)
 
 
