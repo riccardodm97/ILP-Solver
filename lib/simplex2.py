@@ -21,6 +21,15 @@ class SupportData:
             self.inverse_matrix = self.matrix[1:,:-1]   
             self.xb = self.matrix[1:,-1]
 
+        def set_y():
+            
+        def set_xb():
+
+        def set_z():
+
+        def set_inverse_matrix():
+        
+
 def find_initial_basis(A):
     
     base_indexes = []
@@ -41,6 +50,8 @@ def create_artificial_problem(data):
 
 def from_f1_to_f2(data_f1,data):
     #modifica data con i valori presi da data_f1 -> variabili in base , carry ecc 
+    #TODO 
+    return 
 
 def start_simplex(data):
 
@@ -50,6 +61,8 @@ def start_simplex(data):
 
     if -1 in base_indexes:
         phase1(data)
+    
+    phase2(data)
 
 def phase1(data):
 
@@ -58,5 +71,8 @@ def phase1(data):
     #fai cose fino a una soluzione / impossibile 
 
     from_f1_to_f2(data_f1,data)
+
+def phase2(data):
+
 
 
