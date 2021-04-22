@@ -22,9 +22,16 @@ class Support_data:
             self.matrix = np.zeros((num_rows+1,num_rows+1))
             self.y = self.matrix[0,:-1]
             self.z = self.matrix[0,-1]   
-            self.inverse_matrix = self.matrix[1:,:-1]    #da
+            self.inverse_matrix = self.matrix[1:,:-1]   
             self.xb = self.matrix[1:,-1]
 
  #TODO aggiungere metodi di update 
     
-        
+
+
+
+#from f1 to f2 function called by f1 
+
+
+#out of base ordinabile e inizializzato a partire da in base 
+#in base non ordinabile 
