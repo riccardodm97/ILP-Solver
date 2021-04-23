@@ -48,9 +48,24 @@ def compute_out_of_base(data):
 
 
 def create_artificial_problem(data):
+    #create obj function with artificial variables 
+    obj_func = [0 for _ in range(len(data.c))]
+    obj_func.extend([1 for _ in range(data.in_base.count(-1))])
 
-    data_f1= SupportData(cose)  #TODO: cose non so in che modo partendo da data
+    #add artificial columns to the matrix of coefficents  
+    id = np.identity(data.A.shape[0])
+    coeff_matrix = data.A.copy()
+    for i in range(len(data.in_base)):
+        if data.in_base[i] == -1:
+            np.c_[coeff_matrix,id[:,i]]
+
+    #add constant terms 
+    constant_terms = data.b.copy()
+
+    data_f1= SupportData(obj_func,coeff_matrix,constant_terms)  
     compute_out_of_base(data_f1)
+    data_f1.in_base = find_initial_basis(data_f1.A)
+    data_f1.set_inverse_matrix = np.identity(data_f1.A.shape[0])
     return data_f1
 
 def from_f1_to_f2(data_f1,data):
