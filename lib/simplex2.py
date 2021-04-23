@@ -139,7 +139,7 @@ def phase1(data):
         if cost == None: 
             if data_f1.carry.z != 0 :     #TODO: cosa succede se minore di zero 
                 break     #TODO: 'problema originale inammissibile'
-            elif cose :
+            elif "var artificiali ancora in base"  :    #TODO: come prendo gli indici ??
                 break     #TODO: far uscire le variabili artificiali ancora in base 
             else : 
                 break     #TODO: 'nessuna var artificiale in base, uscire e iniziare fase 2 
