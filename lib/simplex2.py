@@ -126,6 +126,8 @@ def phase1(data):
     data_f1 = create_artificial_problem(data)
 
     init_carry(data_f1)
+
+    artificial_vars = []          #TODO: dove le prendo ???
     
     while True :
 
@@ -135,7 +137,13 @@ def phase1(data):
         #calcola i costi ridotti e trova quello negativo con indice minore
         cost,ent_var = determine_entering_var(data_f1)
         if cost == None: 
-            return "trovato ottimo"      #TODO vari casi 
+            if data_f1.carry.z != 0 :     #TODO: cosa succede se minore di zero 
+                break     #TODO: 'problema originale inammissibile'
+            elif cose :
+                break     #TODO: far uscire le variabili artificiali ancora in base 
+            else : 
+                break     #TODO: 'nessuna var artificiale in base, uscire e iniziare fase 2 
+
         
         Aj = np.dot(data_f1.inverse_matrix,data_f1.A[:,ent_var])
 
