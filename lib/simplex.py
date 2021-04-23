@@ -92,7 +92,7 @@ def phase2(data):
 
 
     
-    TODO: controllare ordine variabili base 
+    
 
 
 

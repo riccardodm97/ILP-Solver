@@ -62,15 +62,14 @@ def create_artificial_problem(data):
     #add constant terms 
     constant_terms = data.b.copy()
 
-    data_f1= SupportData(obj_func,coeff_matrix,constant_terms)  
-    compute_out_of_base(data_f1)
+    data_f1= SupportData(obj_func,coeff_matrix,constant_terms)  #create object 
     data_f1.in_base = find_initial_basis(data_f1.A)
     data_f1.set_inverse_matrix = np.identity(data_f1.A.shape[0])
     return data_f1
 
+#TODO 
 def from_f1_to_f2(data_f1,data):
     #modifica data con i valori presi da data_f1 -> variabili in base , carry ecc 
-    #TODO 
     return 
 
 def determine_entering_var(data):
@@ -90,6 +89,23 @@ def determine_exiting_var(data,Aj):
     out_index = h[data.in_base[h].argmin()]       #TODO: test 
     
     return out_index
+
+#TODO: nome ?? 
+def init_carry(data):
+    data.carry.set_xb = np.dot(data.carry.inverse_matrix,data.b)
+    data.carry.set_y = np.dot(-data.c[data.in_base],data.carry.inverse_matrix)
+    data.carry.jset_z = np.dot(data.y,data.b)
+
+#TODO 
+def change_basis(data,h,Aj,cost):
+   
+    data.matrix = data.matrix[h+1]/Aj[h]
+    for i in range(data.matrix.shape[0]):
+        if i != h+1:
+            if i>0 :
+                data.matrix[i] = data.matrix[i]-data.matrix[h+1]*Aj[h]
+            else:
+                data.matrix[i] = data.matrix[i]-data.matrix[h+1]*cost
         
 def start_simplex(data):
 
@@ -98,23 +114,43 @@ def start_simplex(data):
     data.set_inverse_matrix = np.identity(data.A.shape[0])
 
     if -1 in base_indexes:
-        phase1(data)
+        data_f1 = phase1(data)
+        from_f1_to_f2(data_f1,data)            #TODO: quando farlo ? problema impossibile ? 
     
     phase2(data)
+
+    #TODO: leggere data e metter in output ottimo , base , ecc 
 
 def phase1(data):
 
     data_f1 = create_artificial_problem(data)
-    
-    #fai cose fino a una soluzione / impossibile 
 
-    from_f1_to_f2(data_f1,data)
+    init_carry(data_f1)
+    
+    while True :
+
+        #determina le variabili fuori base
+        compute_out_of_base(data_f1)
+
+        #calcola i costi ridotti e trova quello negativo con indice minore
+        cost,ent_var = determine_entering_var(data_f1)
+        if cost == None: 
+            return "trovato ottimo"      #TODO vari casi 
+        
+        Aj = np.dot(data_f1.inverse_matrix,data_f1.A[:,ent_var])
+
+        #determino la variabile uscente
+        ext_var_index = determine_exiting_var(data_f1,Aj)
+
+        #faccio entrare ent_var e uscire ext_var
+        data_f1.in_base[ext_var_index] = ent_var
+
+        #cambio di base
+        change_basis(data_f1,ext_var_index,Aj,cost)
 
 def phase2(data):
 
-    data.carry.set_xb = np.dot(data.inverse_matrix,data.b)
-    data.carry.set_y = np.dot(-data.c[data.in_base],data.inverse_matrix)
-    data.carry.jset_z= np.dot(data.y,data.b)
+    init_carry(data)
 
     while True :
 
@@ -124,12 +160,12 @@ def phase2(data):
         #calcola i costi ridotti e trova quello negativo con indice minore
         cost,ent_var = determine_entering_var(data)
         if cost == None: 
-            return "trovato ottimo"      #TODO
+            break      #TODO 'trovato ottimo'
         
         #verifica condizioni illimitatezza
         Aj = np.dot(data.inverse_matrix,data.A[:,ent_var])
         if (Aj<=0).all() :
-            return 'problema illimitato inferiormente'    #TODO
+            break     #TODO 'problema illimitato inferiormente'
         
         #determino la variabile uscente
         ext_var_index = determine_exiting_var(data,Aj)
@@ -138,13 +174,7 @@ def phase2(data):
         data.in_base[ext_var_index] = ent_var
 
         #cambio di base
-        h = ext_var_index
-        data.matrix = data.matrix[h+1]/Aj[h]
-        for i in range(data.matrix.shape[0]):
-            if i != h+1:
-                if i>0 :
-                    data.matrix[i] = data.matrix[i]-data.matrix[h+1]*Aj[h]
-                else:
-                    data.matrix[i] = data.matrix[i]-data.matrix[h+1]*cost
+        change_basis(data,ext_var_index,Aj,cost)
     
+    return data
     
