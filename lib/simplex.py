@@ -1,6 +1,6 @@
 import numpy as np
 
-class SupportData:
+class SupportData: # TODO Change name
 
     def __init__(self,obj_func_coefficent,coefficent_matrix,constant_terms,num_rows):
         self.c = obj_func_coefficent
@@ -49,8 +49,8 @@ def compute_out_of_base(data):
 
 def create_artificial_problem(data):
     #create obj function with artificial variables 
-    obj_func = [0 for _ in range(len(data.c))]
-    obj_func.extend([1 for _ in range(data.in_base.count(-1))])
+    obj_func = [0 for _ in range(len(data.c))] #TODO: np.zeros_like(data.c)
+    obj_func.extend([1 for _ in range(data.in_base.count(-1))]) #TODO: np.ones_like(data.in_base.count(-1))
 
     #add artificial columns to the matrix of coefficents  
     id = np.identity(data.A.shape[0])
@@ -59,10 +59,13 @@ def create_artificial_problem(data):
         if data.in_base[i] == -1:
             np.c_[coeff_matrix,id[:,i]]
 
+    #add artificial columns to the matrix of coefficents  
+    coeff_matrix = np.c_[coeff_matrix,id]
+
     #add constant terms 
     constant_terms = data.b.copy()
 
-    data_p1= SupportData(obj_func,coeff_matrix,constant_terms)  #create object 
+    data_p1 = SupportData(obj_func,coeff_matrix,constant_terms)  #create object 
     data_p1.in_base = find_initial_basis(data_p1.A)
     data_p1.set_inverse_matrix = np.identity(data_p1.A.shape[0])
     return data_p1
@@ -109,11 +112,10 @@ def change_basis(data,h,Aj,cost):
         
 def start_simplex(data):
 
-    base_indexes = find_initial_basis(data.A)
-    data.in_base = base_indexes 
+    data.in_base = find_initial_basis(data.A) 
     data.set_inverse_matrix = np.identity(data.A.shape[0])
 
-    if -1 in base_indexes:
+    if -1 in data.in_base:
         data_p1 = phase1(data)
         from_p1_to_p2(data_p1,data)            #TODO: quando farlo ? problema impossibile ? 
     
