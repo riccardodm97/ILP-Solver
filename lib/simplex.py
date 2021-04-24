@@ -57,10 +57,7 @@ def create_artificial_problem(data):
     coeff_matrix = data.A.copy()
     for i in range(len(data.in_base)):
         if data.in_base[i] == -1:
-            np.c_[coeff_matrix,id[:,i]]
-
-    #add artificial columns to the matrix of coefficents  
-    coeff_matrix = np.c_[coeff_matrix,id]
+            coeff_matrix = np.c_[coeff_matrix,id[:,i]]
 
     #add constant terms 
     constant_terms = data.b.copy()
