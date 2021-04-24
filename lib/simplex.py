@@ -62,14 +62,14 @@ def create_artificial_problem(data):
     #add constant terms 
     constant_terms = data.b.copy()
 
-    data_f1= SupportData(obj_func,coeff_matrix,constant_terms)  #create object 
-    data_f1.in_base = find_initial_basis(data_f1.A)
-    data_f1.set_inverse_matrix = np.identity(data_f1.A.shape[0])
-    return data_f1
+    data_p1= SupportData(obj_func,coeff_matrix,constant_terms)  #create object 
+    data_p1.in_base = find_initial_basis(data_p1.A)
+    data_p1.set_inverse_matrix = np.identity(data_p1.A.shape[0])
+    return data_p1
 
 #TODO 
-def from_f1_to_f2(data_f1,data):
-    #modifica data con i valori presi da data_f1 -> variabili in base , carry ecc 
+def from_p1_to_p2(data_p1,data):
+    #modifica data con i valori presi da data_p1 -> variabili in base , carry ecc 
     return 
 
 def determine_entering_var(data):
@@ -114,8 +114,8 @@ def start_simplex(data):
     data.set_inverse_matrix = np.identity(data.A.shape[0])
 
     if -1 in base_indexes:
-        data_f1 = phase1(data)
-        from_f1_to_f2(data_f1,data)            #TODO: quando farlo ? problema impossibile ? 
+        data_p1 = phase1(data)
+        from_p1_to_p2(data_p1,data)            #TODO: quando farlo ? problema impossibile ? 
     
     phase2(data)
 
@@ -123,21 +123,21 @@ def start_simplex(data):
 
 def phase1(data):
 
-    data_f1 = create_artificial_problem(data)
+    data_p1 = create_artificial_problem(data)
 
-    init_carry(data_f1)
+    init_carry(data_p1)
 
     artificial_vars = []          #TODO: dove le prendo ???
     
     while True :
 
         #determina le variabili fuori base
-        compute_out_of_base(data_f1)
+        compute_out_of_base(data_p1)
 
         #calcola i costi ridotti e trova quello negativo con indice minore
-        cost,ent_var = determine_entering_var(data_f1)
+        cost,ent_var = determine_entering_var(data_p1)
         if cost == None: 
-            if data_f1.carry.z != 0 :     #TODO: cosa succede se minore di zero 
+            if data_p1.carry.z != 0 :     #TODO: cosa succede se minore di zero 
                 break     #TODO: 'problema originale inammissibile'
             elif "var artificiali ancora in base"  :    #TODO: come prendo gli indici ??
                 break     #TODO: far uscire le variabili artificiali ancora in base 
@@ -145,16 +145,16 @@ def phase1(data):
                 break     #TODO: 'nessuna var artificiale in base, uscire e iniziare fase 2 
 
         
-        Aj = np.dot(data_f1.inverse_matrix,data_f1.A[:,ent_var])
+        Aj = np.dot(data_p1.inverse_matrix,data_p1.A[:,ent_var])
 
         #determino la variabile uscente
-        ext_var_index = determine_exiting_var(data_f1,Aj)
+        ext_var_index = determine_exiting_var(data_p1,Aj)
 
         #faccio entrare ent_var e uscire ext_var
-        data_f1.in_base[ext_var_index] = ent_var
+        data_p1.in_base[ext_var_index] = ent_var
 
         #cambio di base
-        change_basis(data_f1,ext_var_index,Aj,cost)
+        change_basis(data_p1,ext_var_index,Aj,cost)
 
 def phase2(data):
 
