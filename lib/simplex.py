@@ -55,17 +55,24 @@ def create_artificial_problem(data):
     #add artificial columns to the matrix of coefficents  
     id = np.identity(data.A.shape[0])
     coeff_matrix = data.A.copy()
+    new_base = data.in_base.copy()
+    artificial_variables = []
+    count = 0
     for i in range(len(data.in_base)):
         if data.in_base[i] == -1:
+            count += 1
+            index = count + len(data.in_base)
+            artificial_variables.append(index)
+            new_base[i] = index
             coeff_matrix = np.c_[coeff_matrix,id[:,i]]
 
     #add constant terms 
     constant_terms = data.b.copy()
 
     data_p1 = SupportData(obj_func,coeff_matrix,constant_terms)  #create object 
-    data_p1.in_base = find_initial_basis(data_p1.A)
+    data_p1.in_base = new_base #find_initial_basis(data_p1.A) #TODO use updated data.in_base
     data_p1.set_inverse_matrix = np.identity(data_p1.A.shape[0])
-    return data_p1
+    return data_p1, artificial_variables
 
 #TODO 
 def from_p1_to_p2(data_p1,data):
@@ -122,7 +129,7 @@ def start_simplex(data):
 
 def phase1(data):
 
-    data_p1 = create_artificial_problem(data)
+    data_p1, artificial_vars = create_artificial_problem(data)
 
     init_carry(data_p1)
 
