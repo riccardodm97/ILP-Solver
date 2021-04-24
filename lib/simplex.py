@@ -48,9 +48,10 @@ def compute_out_of_base(data):
 
 
 def create_artificial_problem(data):
+
     #create obj function with artificial variables 
-    obj_func = [0 for _ in range(len(data.c))] #TODO: np.zeros_like(data.c)
-    obj_func.extend([1 for _ in range(data.in_base.count(-1))]) #TODO: np.ones_like(data.in_base.count(-1))
+    obj_func = np.zeros_like(data.c)                             #TODO:   [0 for _ in range(len(data.c))]
+    np.concatenate([obj_func,np.ones(data.in_base.count(-1))])      # TODO: obj_func.extend([1 for _ in range(data.in_base.count(-1))]) 
 
     #add artificial columns to the matrix of coefficents  
     id = np.identity(data.A.shape[0])
@@ -62,10 +63,18 @@ def create_artificial_problem(data):
     #add constant terms 
     constant_terms = data.b.copy()
 
-    data_p1 = SupportData(obj_func,coeff_matrix,constant_terms)  #create object 
-    data_p1.in_base = find_initial_basis(data_p1.A)
+    #create object 
+    data_p1 = SupportData(obj_func,coeff_matrix,constant_terms)  
+
+    #artificial variables 
+    data_p1.in_base = data.in_base.copy()
+    artificial_variables = np.arange(len(data.c),len(data.c)+np.count_nonzero(data_p1.in_base == -1))
+    np.place(data_p1.in_base, data_p1.in_base == -1, artificial_variables)
+
+    #init matrix
     data_p1.set_inverse_matrix = np.identity(data_p1.A.shape[0])
-    return data_p1
+
+    return data_p1, artificial_variables
 
 #TODO 
 def from_p1_to_p2(data_p1,data):
