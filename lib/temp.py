@@ -6,4 +6,4 @@ c= np.array([-2,3,4,1])
 
 np.place(new_basis,new_basis==-1,np.arange(len(c),len(c)+np.count_nonzero(new_basis == -1)))
 
-print(new_basis)      #[0,4,3]
+print(new_basis)      #[4,5,3]
