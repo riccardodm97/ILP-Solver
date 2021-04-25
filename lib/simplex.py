@@ -175,8 +175,8 @@ def phase1(data):
             if data_p1.carry.z != 0 :     #TODO: cosa succede se minore di zero 
                 break     #TODO: 'problema originale inammissibile'
             elif np.in1d(data_p1.in_base,artificial_vars).any()  :   
-                substitute_artificial_vars()
-                break     #TODO: far uscire le variabili artificiali ancora in base 
+                lin_dep_rows = substitute_artificial_vars()
+                break     #TODO: eliminare le righe ridondanti
             else : 
                 break     #TODO: 'nessuna var artificiale in base, uscire e iniziare fase 2 
 
