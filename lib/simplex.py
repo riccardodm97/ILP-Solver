@@ -46,6 +46,9 @@ def find_initial_basis(A):
 def compute_out_of_base(data):
     data.out_base = np.array(set(range(data.A.shape[1])) - set(data.in_base)).sort()
 
+def get_Aj(data,j):
+    return np.dot(data.inverse_matrix,data.A[:,j])
+
 
 def create_artificial_problem(data):
 
@@ -95,7 +98,7 @@ def determine_exiting_var(data,Aj):
     h = np.where(arr > 0, arr, np.inf).argmin()
 
     #TODO: qui tocca vedere che porco due ritorna np.where
-    out_index = h[data.in_base[h].argmin()]       #TODO: test 
+    out_index = h[data.in_base[h].argmin()]       #TODO: test          #BLAND rule
     
     return out_index
 
@@ -105,8 +108,8 @@ def init_carry(data):
     data.carry.set_y = np.dot(-data.c[data.in_base],data.carry.inverse_matrix)
     data.carry.jset_z = np.dot(data.y,data.b)
 
-#TODO 
-def change_basis(data,h,Aj,cost):
+#TODO cost=0
+def change_basis(data,h,Aj,cost=0):
    
     data.matrix = data.matrix[h+1]/Aj[h]
     for i in range(data.matrix.shape[0]):
@@ -115,6 +118,32 @@ def change_basis(data,h,Aj,cost):
                 data.matrix[i] = data.matrix[i]-data.matrix[h+1]*Aj[h]
             else:
                 data.matrix[i] = data.matrix[i]-data.matrix[h+1]*cost
+
+def substitute_artificial_vars(data_p1,artificial_vars):
+
+    lin_dependent_rows = []
+
+    idxs = np.where(np.in1d(data_p1.in_base,artificial_vars))
+    #faccio uscire la variabile artificiale all'indice idx 
+    for idx in idxs:
+        #determino chi entra
+        ent_var = None 
+        for var in data_p1.out_base:
+            Aj = get_Aj(var)
+            if Aj[idx] != 0:
+                # entra var 
+                data_p1.in_base[idx] = var
+                change_basis(data_p1,idx,Aj)
+                ent_var = var
+                break
+        if ent_var == None :                            #non esiste una variabile fuori base con cui sositutire la variabile artificiale 
+            lin_dependent_rows.append(idx)              #una riga del sistema originale è ridondante 
+        else :
+            compute_out_of_base(data_p1) 
+        
+    return lin_dependent_rows
+
+
         
 def start_simplex(data):
 
@@ -131,11 +160,9 @@ def start_simplex(data):
 
 def phase1(data):
 
-    data_p1 = create_artificial_problem(data)
+    data_p1,artificial_vars = create_artificial_problem(data)
 
     init_carry(data_p1)
-
-    artificial_vars = []          #TODO: dove le prendo ???
     
     while True :
 
@@ -147,13 +174,14 @@ def phase1(data):
         if cost == None: 
             if data_p1.carry.z != 0 :     #TODO: cosa succede se minore di zero 
                 break     #TODO: 'problema originale inammissibile'
-            elif "var artificiali ancora in base"  :    #TODO: come prendo gli indici ??
+            elif np.in1d(data_p1.in_base,artificial_vars).any()  :   
+                substitute_artificial_vars()
                 break     #TODO: far uscire le variabili artificiali ancora in base 
             else : 
                 break     #TODO: 'nessuna var artificiale in base, uscire e iniziare fase 2 
 
         
-        Aj = np.dot(data_p1.inverse_matrix,data_p1.A[:,ent_var])
+        Aj = get_Aj(data_p1,ent_var)     #np.dot(data_p1.inverse_matrix,data_p1.A[:,ent_var])
 
         #determino la variabile uscente
         ext_var_index = determine_exiting_var(data_p1,Aj)
@@ -179,7 +207,7 @@ def phase2(data):
             break      #TODO 'trovato ottimo'
         
         #verifica condizioni illimitatezza
-        Aj = np.dot(data.inverse_matrix,data.A[:,ent_var])
+        Aj = get_Aj(data,ent_var)
         if (Aj<=0).all() :
             break     #TODO 'problema illimitato inferiormente'
         
