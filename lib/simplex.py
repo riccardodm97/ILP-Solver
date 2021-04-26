@@ -94,13 +94,13 @@ def determine_entering_var(data):
 def determine_exiting_var(data,Aj):
 
     arr = data.carry.xb/Aj
-    arr2 = np.where(arr > 0, arr, np.inf)
-    h = np.where(arr2 == arr2.min())
+    positives = np.where(arr > 0, arr, np.inf)
+    h = np.where(positives == positives.min())
 
     #TODO: rifare 
-    out_index = h[data.in_base[h].argmin()]       #TODO: test          #BLAND rule
+    out_index = h[data.in_base[h].argmin()][0]       #TODO: test          #BLAND rule
     
-    return out_index[0]
+    return out_index
 
 #TODO: nome ?? 
 def init_carry(data):
