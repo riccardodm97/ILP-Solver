@@ -16,7 +16,7 @@ class Carry:
     def __init__(self, num_rows):
         self.matrix = np.zeros((num_rows,num_rows))
         self.y = self.matrix[0,:-1]
-        self.z = np.asarray([self.matrix[0,-1]])        #TODO: ????
+        self.z = self.matrix[0:1,-1]
         self.inverse_matrix = self.matrix[1:,:-1]   
         self.xb = self.matrix[1:,-1]
 
