@@ -16,7 +16,7 @@ class Carry:
     def __init__(self, num_rows):
         self.matrix = np.zeros((num_rows,num_rows))
         self.y = self.matrix[0,:-1]
-        self.z = self.matrix[0,-1]   
+        self.z = np.asarray([self.matrix[0,-1]])        #TODO: ????
         self.inverse_matrix = self.matrix[1:,:-1]   
         self.xb = self.matrix[1:,-1]
 
@@ -28,7 +28,6 @@ class Carry:
 
     def set_z(self, z):
         self.matrix[0,-1] = z
-        self.z = z
 
     def set_inverse_matrix(self, inverse_matrix):
         self.matrix[1:,:-1] = inverse_matrix
@@ -94,13 +93,14 @@ def determine_entering_var(data):
 
 def determine_exiting_var(data,Aj):
 
-    arr = data.xb/Aj
-    h = np.where(arr > 0, arr, np.inf).argmin()
+    arr = data.carry.xb/Aj
+    arr2 = np.where(arr > 0, arr, np.inf)
+    h = np.where(arr2 == arr2.min())
 
-    #TODO: qui tocca vedere che porco due ritorna np.where
+    #TODO: rifare 
     out_index = h[data.in_base[h].argmin()]       #TODO: test          #BLAND rule
     
-    return out_index
+    return out_index[0]
 
 #TODO: nome ?? 
 def init_carry(data):
@@ -111,13 +111,13 @@ def init_carry(data):
 #TODO cost=0
 def change_basis(data,h,Aj,cost=0):
    
-    data.matrix = data.matrix[h+1]/Aj[h]
-    for i in range(data.matrix.shape[0]):
+    data.carry.matrix[h+1] = data.carry.matrix[h+1]/Aj[h]
+    for i in range(data.carry.matrix.shape[0]):
         if i != h+1:
             if i>0 :
-                data.matrix[i] = data.matrix[i]-data.matrix[h+1]*Aj[h]
+                data.carry.matrix[i] = data.carry.matrix[i]-data.carry.matrix[h+1]*Aj[i-1]
             else:
-                data.matrix[i] = data.matrix[i]-data.matrix[h+1]*cost
+                data.carry.matrix[i] = data.carry.matrix[i]-data.carry.matrix[h+1]*cost
 
 def substitute_artificial_vars(data_p1,artificial_vars):
 
@@ -148,7 +148,7 @@ def substitute_artificial_vars(data_p1,artificial_vars):
 def start_simplex(data):
 
     data.in_base = find_initial_basis(data.A) 
-    data.set_inverse_matrix = np.identity(data.A.shape[0])
+    data.carry.set_inverse_matrix(np.identity(data.A.shape[0]))
 
     if -1 in data.in_base:
         data = phase1(data)
@@ -156,7 +156,7 @@ def start_simplex(data):
             return "IMPOSSIBBILE" #TODO Impossible
     
     data = phase2(data)
-    return data.carry.z
+    return data.carry.z[0]
 
 def phase1(data):
 
@@ -172,7 +172,7 @@ def phase1(data):
         #calcola i costi ridotti e trova quello negativo con indice minore
         cost,ent_var = determine_entering_var(data_p1)
         if cost == None: 
-            if data_p1.carry.z != 0 :     #TODO: cosa succede se minore di zero 
+            if data_p1.carry.z[0] != 0 :     #TODO: cosa succede se minore di zero 
                 return None
             elif np.in1d(data_p1.in_base,artificial_vars).any()  :   
                 lin_dep_rows = substitute_artificial_vars(data_p1, artificial_vars)
