@@ -1,7 +1,15 @@
+from lib.simplex import SupportData, start_simplex
 
-matrix = np.array([[1,1,1,-1,0,0],[2,0,-1,1,1,0],[3,1,1,2,0,1]])
-print(matrix)
+A = [
+    [1, 1, 1, -1, 0, 0],
+    [2, 0, -1, 1, 1, 0],
+    [3, 0, 1, 2, 0, 1]
+]
 
-print(find_initial_basis(matrix))
+c = [2, -3, 1, -4, 1, 0]
 
-print(matrix)
+b = [4, 2, 1]
+
+problem = SupportData(c, A, b)
+solution = start_simplex(problem)
+print(solution)

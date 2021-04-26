@@ -2,19 +2,19 @@ import numpy as np
 
 class SupportData: # TODO Change name
 
-    def __init__(self,obj_func_coefficent,coefficent_matrix,constant_terms,num_rows):
-        self.c = obj_func_coefficent
-        self.A = coefficent_matrix
-        self.b = constant_terms 
+    def __init__(self, obj_func_coefficent, coefficent_matrix, constant_terms):
+        self.c = np.array(obj_func_coefficent)
+        self.A = np.array(coefficent_matrix)
+        self.b = np.array(constant_terms) 
 
-        self.in_base = []
-        self.out_base = []
-        self.carry = self.carry(num_rows)
+        self.in_base = None
+        self.out_base = None
+        self.carry = Carry(self.b.size + 1)
 
 class Carry:
     
     def __init__(self, num_rows):
-        self.matrix = np.zeros((num_rows+1,num_rows+1))
+        self.matrix = np.zeros((num_rows,num_rows))
         self.y = self.matrix[0,:-1]
         self.z = self.matrix[0,-1]   
         self.inverse_matrix = self.matrix[1:,:-1]   
@@ -41,20 +41,20 @@ def find_initial_basis(A):
     for col in id_matrix:
         idx = np.where((A.T == col).all(axis=1))
         base_indexes.append(idx[0][0] if len(idx[0])>0 else -1)
-    return base_indexes
+    return np.array(base_indexes)
 
 def compute_out_of_base(data):
-    data.out_base = np.array(set(range(data.A.shape[1])) - set(data.in_base)).sort()
+    data.out_base = np.array(list(set(range(data.A.shape[1])) - set(data.in_base)))
+    data.out_base.sort()
 
 def get_Aj(data,j):
-    return np.dot(data.inverse_matrix,data.A[:,j])
-
+    return np.dot(data.carry.inverse_matrix,data.A[:,j])
 
 def create_artificial_problem(data):
 
     #create obj function with artificial variables 
-    obj_func = np.zeros_like(data.c)                             #TODO:   [0 for _ in range(len(data.c))]
-    np.concatenate([obj_func,np.ones(data.in_base.count(-1))])      # TODO: obj_func.extend([1 for _ in range(data.in_base.count(-1))]) 
+    obj_func = np.zeros_like(data.c)                                        # TODO: [0 for _ in range(len(data.c))]
+    obj_func = np.concatenate([obj_func,np.ones(data.in_base.count(-1))])   # TODO: obj_func.extend([1 for _ in range(data.in_base.count(-1))]) 
 
     #add artificial columns to the matrix of coefficents  
     id = np.identity(data.A.shape[0])
@@ -79,14 +79,14 @@ def create_artificial_problem(data):
 
     return data_p1, artificial_variables
 
-#TODO 
 def from_p1_to_p2(data_p1,data):
-    #modifica data con i valori presi da data_p1 -> variabili in base , carry ecc 
-    return 
+    
+    data.carry.set_inverse_matrix(data_p1.carry.inverse_matrix)
+    data.in_base = data_p1.in_base.copy()
 
 def determine_entering_var(data):
     for j in data.out_base :
-        cj = data.c[j] + np.dot(data.y,data.A[:,j])
+        cj = data.c[j] + np.dot(data.carry.y,data.A[:,j])
         if cj < 0 : 
             return cj,j
     
@@ -104,9 +104,9 @@ def determine_exiting_var(data,Aj):
 
 #TODO: nome ?? 
 def init_carry(data):
-    data.carry.set_xb = np.dot(data.carry.inverse_matrix,data.b)
-    data.carry.set_y = np.dot(-data.c[data.in_base],data.carry.inverse_matrix)
-    data.carry.jset_z = np.dot(data.y,data.b)
+    data.carry.set_xb(np.dot(data.carry.inverse_matrix,data.b)) #TODO Sometimes useless computation
+    data.carry.set_y(np.dot(-data.c[data.in_base],data.carry.inverse_matrix))
+    data.carry.set_z(np.dot(data.carry.y,data.b))
 
 #TODO cost=0
 def change_basis(data,h,Aj,cost=0):
@@ -129,7 +129,7 @@ def substitute_artificial_vars(data_p1,artificial_vars):
         #determino chi entra
         ent_var = None 
         for var in data_p1.out_base:
-            Aj = get_Aj(var)
+            Aj = get_Aj(data_p1, var)
             if Aj[idx] != 0:
                 # entra var 
                 data_p1.in_base[idx] = var
@@ -141,7 +141,7 @@ def substitute_artificial_vars(data_p1,artificial_vars):
         else :
             compute_out_of_base(data_p1) 
         
-    return lin_dependent_rows
+    return np.array(lin_dependent_rows)
 
 
         
@@ -151,12 +151,12 @@ def start_simplex(data):
     data.set_inverse_matrix = np.identity(data.A.shape[0])
 
     if -1 in data.in_base:
-        data_p1 = phase1(data)
-        from_p1_to_p2(data_p1,data)            #TODO: quando farlo ? problema impossibile ? 
+        data = phase1(data)
+        if data is None:
+            return "IMPOSSIBBILE" #TODO Impossible
     
-    phase2(data)
-
-    #TODO: leggere data e metter in output ottimo , base , ecc 
+    data = phase2(data)
+    return data.carry.z
 
 def phase1(data):
 
@@ -173,13 +173,13 @@ def phase1(data):
         cost,ent_var = determine_entering_var(data_p1)
         if cost == None: 
             if data_p1.carry.z != 0 :     #TODO: cosa succede se minore di zero 
-                break     #TODO: 'problema originale inammissibile'
+                return None
             elif np.in1d(data_p1.in_base,artificial_vars).any()  :   
-                lin_dep_rows = substitute_artificial_vars()
-                break     #TODO: eliminare le righe ridondanti
-            else : 
-                break     #TODO: 'nessuna var artificiale in base, uscire e iniziare fase 2 
-
+                lin_dep_rows = substitute_artificial_vars(data_p1, artificial_vars)
+                data.A = np.delete(data.A, lin_dep_rows, axis=0)
+            
+            from_p1_to_p2(data_p1, data)
+            return data
         
         Aj = get_Aj(data_p1,ent_var)     #np.dot(data_p1.inverse_matrix,data_p1.A[:,ent_var])
 
