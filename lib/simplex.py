@@ -53,7 +53,7 @@ def create_artificial_problem(data):
 
     #create obj function with artificial variables 
     obj_func = np.zeros_like(data.c)                                        # TODO: [0 for _ in range(len(data.c))]
-    obj_func = np.concatenate([obj_func,np.ones(data.in_base.count(-1))])   # TODO: obj_func.extend([1 for _ in range(data.in_base.count(-1))]) 
+    obj_func = np.concatenate([obj_func,np.ones(np.count_nonzero(data.in_base == -1))])   # TODO: obj_func.extend([1 for _ in range(data.in_base.count(-1))]) 
 
     #add artificial columns to the matrix of coefficents  
     id = np.identity(data.A.shape[0])
@@ -156,7 +156,7 @@ def start_simplex(data):
             return "IMPOSSIBBILE" #TODO Impossible
     
     data = phase2(data)
-    return data.carry.z[0]
+    return -data.carry.z[0]
 
 def phase1(data):
 
@@ -174,7 +174,7 @@ def phase1(data):
         if cost == None: 
             if data_p1.carry.z[0] != 0 :     #TODO: cosa succede se minore di zero 
                 return None
-            elif np.in1d(data_p1.in_base,artificial_vars).any()  :   
+            elif np.in1d(data_p1.in_base,artificial_vars).any():   
                 lin_dep_rows = substitute_artificial_vars(data_p1, artificial_vars)
                 data.A = np.delete(data.A, lin_dep_rows, axis=0)
             
