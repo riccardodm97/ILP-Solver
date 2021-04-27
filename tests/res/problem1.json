@@ -5,27 +5,28 @@
     },
     "constraints": [
         {
-            "coefficients": [1, 1, 1, -1],
+            "coefficients": [1, 1, 1, -1, 0],
             "constant": 4,
             "type": "EQ"
         },
         {
-            "coefficients": [2, 0, -1, 1],
+            "coefficients": [2, 0, -1, 1, 1],
             "constant": 2,
             "type": "EQ"
         },
         {
-            "coefficients": [3, 0, 1, 2],
+            "coefficients": [3, 0, 1, 2, 0],
             "constant": 1,
-            "type": "EQ"
+            "type": "LEQ"
         }
     ],
     "non-negatives": [0, 1, 2, 3, 4],
     "solution": {
         "standard": [
-            [1, 1, 1, -1, 0, 0],
-            [2, 0, -1, 1, 1, 0],
-            [3, 0, 1, 2, 0, 1]
+            [2, -3,  1, -4,  1,  0,  0],
+            [1,  1,  1, -1,  0,  0,  4],
+            [2,  0, -1,  1,  1,  0,  2],
+            [3,  0,  1,  2,  0,  1,  1]
         ],
         "basis": ["9/2", "3/2", "1/2"],
         "value": -14

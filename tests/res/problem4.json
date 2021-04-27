@@ -1,0 +1,34 @@
+{
+    "objective": {
+        "costs": [3, 1, 3],
+        "optmimization": "MAX"
+    },
+    "constraints": [
+        {
+            "coefficients": [2, 1, 1],
+            "constant": 2,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [1, 2, 3],
+            "constant": 5,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [2, 2, 1],
+            "constant": 6,
+            "type": "LEQ"
+        }
+    ],
+    "non-negatives": [0, 1, 2],
+    "solution": {
+        "standard": [
+            [-3, -1, -3, 0, 0, 0, 0],
+            [2, 1, 1, 1, 0, 0, 2],
+            [1, 2, 3, 0, 1, 0, 5],
+            [2, 2, 1, 0, 0, 1, 6]
+        ],
+        "basis": [0.2, 0, 1.6, 0, 0, 4],
+        "value": -5.4
+    }
+}
