@@ -13,29 +13,29 @@ class TestSimplex(unittest.TestCase):
     base_dir = os.path.join(os.path.dirname(__file__))
 
     def test_find_initial_basis(self):
-        self.assertEqual(find_initial_basis(np.array([
+        self.assertTrue((find_initial_basis(np.array([
             [0, 0, 1], 
             [1, 0, 0], 
             [0, 1, 0]
-        ])), [2, 0, 1])
+        ])) == [2, 0, 1]).all())
 
-        self.assertEqual(find_initial_basis(np.array([
+        self.assertTrue((find_initial_basis(np.array([
             [7, 0, 0], 
             [0, 0, 1], 
             [0, 1, 0]
-        ])), [-1, 2, 1])
+        ])) == [-1, 2, 1]).all())
 
-        self.assertEqual(find_initial_basis(np.array([
+        self.assertTrue((find_initial_basis(np.array([
             [0, 0, 0], 
             [0, 0, 0], 
             [1, 1, 1]
-        ])), [-1, -1, 0])
+        ])) == [-1, -1, 0]).all())
 
-        self.assertEqual(find_initial_basis(np.array([
+        self.assertTrue((find_initial_basis(np.array([
             [22, 0, -2, 1, 4], 
             [3, 0, 4, 0, 3], 
             [54, 1, 2, 0, 2]
-        ])), [3, -1, 1])
+        ])) == [3, -1, 1]).all())
         
     def test_compute_out_of_base(self):
         ps = [
@@ -62,13 +62,17 @@ class TestSimplex(unittest.TestCase):
         ]
 
         sols = [
-            [], [0], [1, 2], [0, 2]
+            [], [0], [1, 2], [0, 2, 4]
         ]
 
         for p, sol in zip(ps, sols):
+            sol = np.array(sol)
             p.in_base = find_initial_basis(p.A)
             compute_out_of_base(p)
-            self.assertTrue((np.array(p.out_base) == np.array(sol)).all())
+            self.assertEqual(p.out_base.shape, sol.shape)
+
+            if p.out_base.shape == sol.shape:
+                self.assertTrue((p.out_base == sol).all())
         
     def test_create_artificial_problem(self):
         for i in range(10):
