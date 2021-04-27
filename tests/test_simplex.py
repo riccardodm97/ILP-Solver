@@ -1,11 +1,16 @@
+from fractions import Fraction
+import os
 import unittest
 import numpy as np 
 
 from lib.simplex import find_initial_basis, compute_out_of_base, create_artificial_problem, \
     determine_entering_var, determine_exiting_var, determine_exiting_var, init_carry, \
     change_basis, start_simplex, phase1, phase2, SupportData, Carry
+from utility import deserialize_problem, get_standard_form
 
 class TestSimplex(unittest.TestCase):
+
+    base_dir = os.path.join(os.path.dirname(__file__))
 
     def test_find_initial_basis(self):
         self.assertEqual(find_initial_basis(np.array([
@@ -98,7 +103,18 @@ class TestSimplex(unittest.TestCase):
         change_basis(data, h, Aj, cost)
         
     def test_start_simplex(self):
-        start_simplex(data)
+        problems = self.__load_problems()
+        for p, A, b, c in problems:
+            data = SupportData(c, A, b)
+            sol = start_simplex(data)
+
+            if 'value' in p['solution']:
+                if type(p['solution']['value']) == str:
+                    sol_real = Fraction(p['solution']['value'])
+                    sol_real = sol_real.numerator / sol_real.denominator
+                else:
+                    sol_real = p['solution']['value']
+                self.assertEqual(sol, sol_real)
 
     def test_phase1(self):
         phase1(data)
@@ -150,4 +166,14 @@ class TestSimplex(unittest.TestCase):
         else:
             c = np.array(c)
 
-        return SupportData(c, A, b, num_rows=constraints)
+        return SupportData(c, A, b)
+
+
+    def __load_problems(self):
+        problems = []
+        for p in [self.base_dir+'/res/problem'+str(i)+'.json' for i in range(1, 8)]:
+            problem, A, b, c = deserialize_problem(p)
+            std_problem = get_standard_form(problem, A, b, c)
+            problems.append((problem, std_problem[1:,:-1], std_problem[1:,-1], std_problem[0,0:-1]))
+
+        return problems

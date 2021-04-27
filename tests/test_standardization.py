@@ -1,5 +1,6 @@
 import unittest
 import os 
+import numpy as np
 
 from lib.utility import deserialize_problem, get_standard_form
 
@@ -18,9 +19,13 @@ class TestStandardization(unittest.TestCase):
         for p in self.__get_problem_files():
             problem, A, b, c = deserialize_problem(p)
 
-            if 'standard' in problem:
+            if 'standard' in problem['solution']:
                 std_problem = get_standard_form(problem, A, b, c)
-                self.assertTrue((std_problem == problem['standard']).all())
+                std_real = np.array(problem['solution']['standard'])
+                self.assertEqual(std_problem.shape, std_real.shape)
+
+                if std_problem.shape == std_real.shape:
+                    self.assertTrue((std_problem == std_real).all())
 
     def __get_problem_files(self):
         return [self.base_dir+'/res/problem'+str(i)+'.json' for i in range(1, 8)]
