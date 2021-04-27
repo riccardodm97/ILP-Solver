@@ -23,6 +23,7 @@ def get_standard_form(problem, A, b, c):
         problem['objective']['optmimization'] = 'MIN'
         Ac[0,:] *= -1
 
+
     # 2. Perform variable change over non-positive variables
     positive_variables = np.zeros(cols, dtype=bool)
 
@@ -31,7 +32,10 @@ def get_standard_form(problem, A, b, c):
             positive_variables[i] = True
 
     for var in np.where(positive_variables == False):
-        Ac = np.c_[Ac, Ac[:, var + 1] * -1]
+        if 'non-positives' in problem and var in problem['non-positives']:
+            Ac[:, var] *= -1
+        else: 
+            Ac = np.c_[Ac, Ac[:, var] * -1]
 
     # 3. Add slack variables to change constraints into equations
     for index, constraint in enumerate(problem['constraints']):
