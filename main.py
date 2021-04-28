@@ -1,4 +1,4 @@
-from lib.simplex import SupportData, start_simplex
+from lib.simplex import SimplexProblem
 
 A = [
     [1, 1, 1, -1, 0, 0],
@@ -10,6 +10,6 @@ c = [2, -3, 1, -4, 1, 0]
 
 b = [4, 2, 1]
 
-problem = SupportData(c, A, b)
-solution = start_simplex(problem)
+problem = SimplexProblem(c, A, b)
+solution = problem.start_simplex()
 print(solution)
