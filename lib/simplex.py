@@ -11,10 +11,19 @@ class SimplexProblem:
         self.out_basis = None
 
         self.carry_matrix = np.zeros((self.b.size + 1,self.b.size + 1))
-        self.y = self.carry_matrix[0,:-1]
-        self.z = self.carry_matrix[0:1,-1]
-        self.inverse_matrix = self.carry_matrix[1:,:-1]   
-        self.xb = self.carry_matrix[1:,-1]
+        # self.y = self.carry_matrix[0,:-1]
+        # self.z = self.carry_matrix[0:1,-1]
+        # self.inverse_matrix = self.carry_matrix[1:,:-1]   
+        # self.xb = self.carry_matrix[1:,-1]
+
+    def get_y(self):
+        return self.carry_matrix[0,:-1]
+    def get_z(self):
+        return self.carry_matrix[0:1,-1]
+    def get_inverse_matrix(self):
+        return self.carry_matrix[1:,:-1]  
+    def get_xb(self):
+        return self.carry_matrix[1:,-1]
     
     def set_carry_matrix(self, matrix):
         self.carry_matrix = matrix
@@ -43,23 +52,23 @@ class SimplexProblem:
         self.in_basis = np.array(base_indexes) 
     
     def init_carry(self):
-        self.set_xb(np.dot(self.inverse_matrix,self.b))                #TODO Sometimes useless computation
-        self.set_y(np.dot(-self.c[self.in_basis],self.inverse_matrix))
-        self.set_z(np.dot(self.y,self.b))
+        self.set_xb(np.dot(self.get_inverse_matrix(),self.b))                #TODO Sometimes useless computation
+        self.set_y(np.dot(-self.c[self.in_basis],self.get_inverse_matrix()))
+        self.set_z(np.dot(self.get_y(),self.b))
     
     def compute_out_of_base(self):
         self.out_basis = np.array(list(set(range(self.A.shape[1])) - set(self.in_basis)))
         self.out_basis.sort()      #BLAND rule
     
     def get_Aj(self, j):
-        return np.dot(self.inverse_matrix,self.A[:,j])
+        return np.dot(self.get_inverse_matrix(),self.A[:,j])
     
     def swap_vars(self,ext_var,ent_var):
         self.in_basis[ext_var] = ent_var
     
     def determine_entering_var(self):
         for j in self.out_basis :
-            cj = self.c[j] + np.dot(self.y,self.A[:,j])
+            cj = self.c[j] + np.dot(self.get_y(),self.A[:,j])
             if cj < 0 : 
                 return cj,j
         
@@ -70,7 +79,7 @@ class SimplexProblem:
         if (Aj<=0).all() :                            #unlimited problem            
             return None,None 
 
-        arr = self.xb/Aj
+        arr = self.get_xb()/Aj
         positives = np.where(arr > 0, arr, np.inf)
         h = np.where(positives == positives.min())
 
@@ -106,7 +115,7 @@ class SimplexArtificialProblem(SimplexProblem):
         lin_dependent_rows = []
         idxs = np.where(np.in1d(self.in_basis,self.artificial_vars))
         #all artificial var with idx index should leave basis  
-        for idx in idxs:
+        for idx in idxs[0]:
             #determine which is entering
             ent_var = None 
             for var in self.out_basis:
@@ -114,7 +123,7 @@ class SimplexArtificialProblem(SimplexProblem):
                 if Aj[idx] != 0:
                     # var entering
                     self.in_basis[idx] = var
-                    self.change_basis(idx,Aj)
+                    self.update_carry(idx,Aj)
                     ent_var = var
                     break                                   
             if ent_var == None :                            #cannot find a substituting out of base var
@@ -162,7 +171,7 @@ def simplex_algorithm(c, A, b):
             return ret_type
     
     phase2(problem)
-    print("the optimum value is",-problem.z[0])
+    print("the optimum value is",-problem.get_z()[0])
 
 def from_p1_to_p2(p1,p,lin_dep_rows):
     if lin_dep_rows is not None :
@@ -200,7 +209,7 @@ def phase1(p):
         cost,ent_var = p1.determine_entering_var()
         lin_dep_rows = None
         if cost == None:                                    #no negative cost found
-            if p1.z[0] != 0 :                               #TODO: cosa succede se minore di zero 
+            if p1.get_z()[0] != 0 :                               #TODO: cosa succede se minore di zero 
                 return "original problem is impossible"     #TODO: return type
             elif p1.check_basis():   
                 lin_dep_rows = p1.substitute_artificial_vars()   
