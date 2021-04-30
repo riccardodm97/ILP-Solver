@@ -104,7 +104,6 @@ class SimplexArtificialProblem(SimplexProblem):
 
     def substitute_artificial_vars(self):
         lin_dependent_rows = []
-
         idxs = np.where(np.in1d(self.in_basis,self.artificial_vars))
         #all artificial var with idx index should leave basis  
         for idx in idxs:
@@ -123,11 +122,11 @@ class SimplexArtificialProblem(SimplexProblem):
             else :
                 self.compute_out_of_base() 
             
-        return np.array(lin_dependent_rows)
+        return np.array(lin_dependent_rows) if lin_dependent_rows else None
  
 
 def define_artificial_problem(p):
-    r = np.count_nonzero(p.in_base == -1)    #num of var to be replaced by artificial ones 
+    r = np.count_nonzero(p.in_basis == -1)    #num of var to be replaced by artificial ones 
     
     #create obj function with artificial variables 
     obj_func = np.zeros_like(p.c)                                                        
@@ -137,7 +136,7 @@ def define_artificial_problem(p):
     id = np.identity(p.A.shape[0])
     coeff_matrix = p.A.copy()
     for i in range(len(p.in_basis)):
-        if p.in_base[i] == -1:
+        if p.in_basis[i] == -1:
             coeff_matrix = np.c_[coeff_matrix,id[:,i]]
 
     #copy costant terms 
@@ -166,7 +165,7 @@ def simplex_algorithm(c, A, b):
     print("the optimum value is",-problem.z[0])
 
 def from_p1_to_p2(p1,p,lin_dep_rows):
-    if lin_dep_rows :
+    if lin_dep_rows is not None :
         #modify original problem data
         p.A = np.delete(p.A, lin_dep_rows, axis=0)
         p.b = np.delete(p.b,lin_dep_rows)
@@ -199,6 +198,7 @@ def phase1(p):
 
         #compute reduced costs and determine entering var 
         cost,ent_var = p1.determine_entering_var()
+        lin_dep_rows = None
         if cost == None:                                    #no negative cost found
             if p1.z[0] != 0 :                               #TODO: cosa succede se minore di zero 
                 return "original problem is impossible"     #TODO: return type
