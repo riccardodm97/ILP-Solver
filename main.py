@@ -1,4 +1,4 @@
-from lib.temp import simplex_algorithm
+from lib.simplex import simplex_algorithm
 
 A = [
     [1, -1, 3, 2],
