@@ -185,6 +185,7 @@ class SimplexProblem:
             self.change_basis(ext_var_index,Aj,cost)
         
 class SimplexArtificialProblem(SimplexProblem):
+    
     def substitute_artificial_vars(data_p1,artificial_vars):
 
         lin_dependent_rows = []
