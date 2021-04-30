@@ -1,4 +1,4 @@
-from lib.simplex import SimplexProblem
+from lib.temp import simplex_algorithm
 
 A = [
     [1, 1, 1, -1, 0, 0],
@@ -10,6 +10,4 @@ c = [2, -3, 1, -4, 1, 0]
 
 b = [4, 2, 1]
 
-problem = SimplexProblem(c, A, b)
-solution = problem.start_simplex()
-print(solution)
+simplex_algorithm(c, A, b)

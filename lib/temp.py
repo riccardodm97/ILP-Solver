@@ -48,11 +48,14 @@ class SimplexProblem:
         self.set_z(np.dot(self.y,self.b))
     
     def compute_out_of_base(self):
-        self.out_basis = np.array(list(set(range(self.A.shape[1])) - set(self.in_base)))
+        self.out_basis = np.array(list(set(range(self.A.shape[1])) - set(self.in_basis)))
         self.out_basis.sort()      #BLAND rule
     
     def get_Aj(self, j):
         return np.dot(self.inverse_matrix,self.A[:,j])
+    
+    def swap_vars(self,ext_var,ent_var):
+        self.in_basis[ext_var] = ent_var
     
     def determine_entering_var(self):
         for j in self.out_basis :
@@ -60,7 +63,30 @@ class SimplexProblem:
             if cj < 0 : 
                 return cj,j
         
-        return None,None 
+        return None,None
+    
+    def determine_exiting_var(self,ent_var):
+        Aj = self.get_Aj(ent_var)
+        if (Aj<=0).all() :                            #unlimited problem            
+            return None,None 
+
+        arr = self.xb/Aj
+        positives = np.where(arr > 0, arr, np.inf)
+        h = np.where(positives == positives.min())
+
+        out_index = h[self.in_basis[h].argmin()][0]     #BLAND rule
+        
+        return Aj,out_index
+
+    def update_carry(self,h,Aj,cost=None):
+        self.carry_matrix[h+1] = self.carry_matrix[h+1]/Aj[h]
+        for i in range(self.carry_matrix.shape[0]):
+            if i != h+1:
+                if i == 0 and cost is not None:
+                    self.carry_matrix[i] = self.carry_matrix[i]-self.carry_matrix[h+1]*cost
+                else :
+                    self.carry_matrix[i] = self.carry_matrix[i]-self.carry_matrix[h+1]*Aj[i-1]
+                
 
 class SimplexArtificialProblem(SimplexProblem):
     def __init__(self, obj_func_coefficent, coefficent_matrix, constant_terms,artificial_vars,old_basis):
@@ -98,15 +124,7 @@ class SimplexArtificialProblem(SimplexProblem):
                 self.compute_out_of_base() 
             
         return np.array(lin_dependent_rows)
-    
-
-def find_initial_basis(p):
-    base_indexes = []
-    id_matrix = np.identity(p.A.shape[0])
-    for col in id_matrix:
-        idx = np.where((p.A.T == col).all(axis=1))
-        base_indexes.append(idx[0][0] if len(idx[0])>0 else -1)
-    return np.array(base_indexes) 
+ 
 
 def define_artificial_problem(p):
     r = np.count_nonzero(p.in_base == -1)    #num of var to be replaced by artificial ones 
@@ -128,7 +146,6 @@ def define_artificial_problem(p):
     #determine artificial vars
     artificial_variables = np.arange(len(p.c),len(p.c)+r)
     
-
     return obj_func,coeff_matrix,constant_terms,artificial_variables
 
 def simplex_algorithm(c, A, b):
@@ -141,10 +158,25 @@ def simplex_algorithm(c, A, b):
     
     #if cannot find starting basis phase1 is needed 
     if problem.check_basis():
-        phase1(problem)
-        return 
-    return 
-        
+        ret_type = phase1(problem)             #TODO: return type                    
+        if ret_type is None:                   #TODO: modificare in base al valore di ritorno
+            return ret_type
+    
+    phase2(problem)
+    print("the optimum value is",-problem.z[0])
+
+def from_p1_to_p2(p1,p,lin_dep_rows):
+    if lin_dep_rows :
+        #modify original problem data
+        p.A = np.delete(p.A, lin_dep_rows, axis=0)
+        p.b = np.delete(p.b,lin_dep_rows)
+        #modify phase1 dara
+        p1.set_carry_matrix = np.delete(p1.carry_matrix, lin_dep_rows+1 , axis=0)   #delete rows from carry
+        p1.set_carry_matrix = np.delete(p1.carry_matrix, lin_dep_rows, axis=1)      #delete columns from carry
+        p1.in_basis = np.delete(p1.in_basis,lin_dep_rows)
+
+    p.set_carry_matrix(p1.carry_matrix)
+    p.in_basis = p1.in_basis.copy()
 
 
 def phase1(p):
@@ -152,71 +184,60 @@ def phase1(p):
     c,A,b,art_vars = define_artificial_problem(p)
 
     #create object 
-    problem_p1 = SimplexArtificialProblem(c,A,b,art_vars,p.in_basis.copy())
+    p1 = SimplexArtificialProblem(c,A,b,art_vars,p.in_basis.copy())
 
     #set starting basis 
-    problem_p1.find_initial_basis()
-    problem_p1.set_inverse_matrix()
+    p1.find_initial_basis()
+    p1.set_inverse_matrix()
 
-    problem_p1.init_carry()
+    p1.init_carry()
 
     while True :
 
         #save out of basis vars
-        problem_p1.compute_out_of_base()
+        p1.compute_out_of_base()
 
         #compute reduced costs and determine entering var 
-        cost,ent_var = problem_p1.determine_entering_var()
-        if cost == None:               #no negative cost found
-            if problem_p1.z[0] != 0 :     #TODO: cosa succede se minore di zero 
-                return None               #TODO: return type
-            elif problem_p1.check_basis():   
-                lin_dep_rows = data_p1.substitute_artificial_vars(artificial_vars)
-                self.A = np.delete(self.A, lin_dep_rows, axis=0)
-            
-            from_p1_to_p2(data_p1, self)
-        
-        Aj = data_p1.get_Aj(ent_var)     #np.dot(data_p1.inverse_matrix,data_p1.A[:,ent_var])
+        cost,ent_var = p1.determine_entering_var()
+        if cost == None:                                    #no negative cost found
+            if p1.z[0] != 0 :                               #TODO: cosa succede se minore di zero 
+                return "original problem is impossible"     #TODO: return type
+            elif p1.check_basis():   
+                lin_dep_rows = p1.substitute_artificial_vars()   
 
-        #determino la variabile uscente
-        ext_var_index = data_p1.determine_exiting_var(Aj)
+            from_p1_to_p2(p1,p,lin_dep_rows)
+            return "go on with phase 2"                      #TODO : return type  
 
-        #faccio entrare ent_var e uscire ext_var
-        data_p1.in_base[ext_var_index] = ent_var
+        #determine exiting var 
+        Aj,ext_var_index = p1.determine_exiting_var(ent_var)
 
-        #cambio di base
-        data_p1.change_basis(ext_var_index,Aj,cost)
+        #ent_var entering basis , ext_var leaving
+        p1.swap_vars(ext_var_index,ent_var)        
 
+        #modify carry matrix 
+        p1.update_carry(ext_var_index,Aj,cost)
 
-    
+def phase2(p):
 
-    data_p1.init_carry()
-    
+    p.init_carry()
+
     while True :
 
-        #determina le variabili fuori base
-        data_p1.compute_out_of_base()
+        #save out of basis vars
+        p.compute_out_of_base()
 
-        #calcola i costi ridotti e trova quello negativo con indice minore
-        cost,ent_var = data_p1.determine_entering_var()
+        #compute reduced costs and determine entering var 
+        cost,ent_var = p.determine_entering_var()
         if cost == None: 
-            if data_p1.z[0] != 0 :     #TODO: cosa succede se minore di zero 
-                return None
-            elif np.in1d(data_p1.in_base,artificial_vars).any():   
-                lin_dep_rows = data_p1.substitute_artificial_vars(artificial_vars)
-                self.A = np.delete(self.A, lin_dep_rows, axis=0)
-            
-            from_p1_to_p2(data_p1, self)
+            return "found optimum of original problem"      #TODO return type
         
-        Aj = data_p1.get_Aj(ent_var)     #np.dot(data_p1.inverse_matrix,data_p1.A[:,ent_var])
+        #determine exiting var 
+        Aj,ext_var_index = p.determine_exiting_var(ent_var)
+        if Aj is None:
+            return "unlimited problem"                      #TODO: return type
+        
+        #ent_var entering basis , ext_var leaving
+        p.swap_vars(ext_var_index,ent_var)        
 
-        #determino la variabile uscente
-        ext_var_index = data_p1.determine_exiting_var(Aj)
-
-        #faccio entrare ent_var e uscire ext_var
-        data_p1.in_base[ext_var_index] = ent_var
-
-        #cambio di base
-        data_p1.change_basis(ext_var_index,Aj,cost)
-
-
+        #modify carry matrix 
+        p.update_carry(ext_var_index,Aj,cost)
