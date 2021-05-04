@@ -11,10 +11,6 @@ class SimplexProblem:
         self.out_basis = None
 
         self.carry_matrix = np.zeros((self.b.size + 1,self.b.size + 1))
-        # self.y = self.carry_matrix[0,:-1]
-        # self.z = self.carry_matrix[0:1,-1]
-        # self.inverse_matrix = self.carry_matrix[1:,:-1]   
-        # self.xb = self.carry_matrix[1:,-1]
 
     def get_y(self):
         return self.carry_matrix[0,:-1]
@@ -118,7 +114,7 @@ class SimplexArtificialProblem(SimplexProblem):
         for idx in idxs[0]:
             #determine which is entering
             ent_var = None 
-            for var in self.out_basis:
+            for var in self.out_basis[~np.isin(self.out_basis,self.artificial_vars)]:
                 Aj = self.get_Aj(var)
                 if Aj[idx] != 0:
                     # var entering
@@ -171,7 +167,7 @@ def simplex_algorithm(c, A, b):
             return ret_type
     
     phase2(problem)
-    print("the optimum value is",-problem.get_z()[0])
+    print("\nthe optimum value is",-problem.get_z()[0])
 
 def from_p1_to_p2(p1,p,lin_dep_rows):
     if lin_dep_rows is not None :
@@ -179,15 +175,15 @@ def from_p1_to_p2(p1,p,lin_dep_rows):
         p.A = np.delete(p.A, lin_dep_rows, axis=0)
         p.b = np.delete(p.b,lin_dep_rows)
         #modify phase1 dara
-        p1.set_carry_matrix = np.delete(p1.carry_matrix, lin_dep_rows+1 , axis=0)   #delete rows from carry
-        p1.set_carry_matrix = np.delete(p1.carry_matrix, lin_dep_rows, axis=1)      #delete columns from carry
+        p1.set_carry_matrix(np.delete(p1.carry_matrix, lin_dep_rows+1 , axis=0))   #delete rows from carry
+        p1.set_carry_matrix(np.delete(p1.carry_matrix, lin_dep_rows, axis=1))     #delete columns from carry
         p1.in_basis = np.delete(p1.in_basis,lin_dep_rows)
 
     p.set_carry_matrix(p1.carry_matrix)
     p.in_basis = p1.in_basis.copy()
 
 
-def phase1(p):
+def phase1(p : SimplexProblem):
     #determine changes to make for artificial problem
     c,A,b,art_vars = define_artificial_problem(p)
 
@@ -226,7 +222,7 @@ def phase1(p):
         #modify carry matrix 
         p1.update_carry(ext_var_index,Aj,cost)
 
-def phase2(p):
+def phase2(p : SimplexProblem):
 
     p.init_carry()
 
