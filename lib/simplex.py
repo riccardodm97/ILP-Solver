@@ -176,8 +176,8 @@ def from_p1_to_p2(p1,p,lin_dep_rows):
         p.b = np.delete(p.b,lin_dep_rows)
         #modify phase1 dara
         p1.set_carry_matrix(np.delete(p1.carry_matrix, lin_dep_rows+1 , axis=0))   #delete rows from carry
-        p1.set_carry_matrix(np.delete(p1.carry_matrix, lin_dep_rows, axis=1))     #delete columns from carry
-        p1.in_basis = np.delete(p1.in_basis,lin_dep_rows)
+        p1.set_carry_matrix(np.delete(p1.carry_matrix, lin_dep_rows, axis=1))      #delete columns from carry
+        p1.in_basis = np.delete(p1.in_basis,lin_dep_rows)                          #remove not needed in basis variable 
 
     p.set_carry_matrix(p1.carry_matrix)
     p.in_basis = p1.in_basis.copy()
