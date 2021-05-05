@@ -15,7 +15,8 @@ class SimplexProblem:
     def get_y(self):
         return self.carry_matrix[0,:-1]
     def get_z(self):
-        return self.carry_matrix[0:1,-1]
+        #TODO: Return scalar?
+        return self.carry_matrix[0:1,-1] 
     def get_inverse_matrix(self):
         return self.carry_matrix[1:,:-1]  
     def get_xb(self):
@@ -152,7 +153,7 @@ def define_artificial_problem(p):
     
     return obj_func,coeff_matrix,constant_terms,artificial_variables
 
-def simplex_algorithm(c, A, b):
+def simplex_algorithm(c, A, b): #TODO SimplexProblem as argument?
     #create object 
     problem = SimplexProblem(c, A, b)
 
@@ -168,6 +169,7 @@ def simplex_algorithm(c, A, b):
     
     phase2(problem)
     print("\nthe optimum value is",-problem.get_z()[0])
+    #TODO Return both -problem.get_z()[0] and np.where(p.in_basis, p.get_xb(), 0)?
 
 def from_p1_to_p2(p1,p,lin_dep_rows):
     if lin_dep_rows is not None :
