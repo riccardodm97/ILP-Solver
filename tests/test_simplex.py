@@ -8,6 +8,27 @@ from lib.utility import deserialize_problem, get_standard_form
 
 class TestSimplex(unittest.TestCase):
         
+    def _fract_to_dec(self, fract):
+        if isinstance(fract, np.ndarray):
+            if fract.dtype.type is np.str_:
+                tmp = []
+                for x in fract:
+                    tmp.append(self._fract_to_dec(str(x)))
+                val = np.array(tmp)
+            else:
+                val = fract
+
+            val = np.around(val, SimplexProblem.DECIMAL_PRECISION)
+        else:
+            if type(fract) == str:
+                val = Fraction(fract)
+                val = val.numerator / val.denominator
+            else:
+                val = fract
+
+            val = round(val, SimplexProblem.DECIMAL_PRECISION)
+        return val
+
     def _get_base_dir(self):
         return os.path.join(os.path.dirname(__file__))
 
@@ -199,17 +220,15 @@ class TestSimplexFunctions(TestSimplex):
                 self.assertEqual(ret.value, p['solution']['type'])
 
             if ret is SimplexSolution.FINITE:
-                if 'sol' in p['solution']:
-                    self.assertTrue((sol == np.array(p['solution']['sol'])).all())
+                if 'basis' in p['solution']:
+                    arr = self._fract_to_dec(np.array(p['solution']['basis']))
+                    
+                    self.assertEqual(sol.shape, arr.shape)
+                    if sol.shape == arr.shape:
+                        self.assertTrue((sol == arr).all())
 
                 if 'value' in p['solution']:
-                    if type(p['solution']['value']) == str:
-                        sol_real = Fraction(p['solution']['value'])
-                        sol_real = sol_real.numerator / sol_real.denominator
-                    else:
-                        sol_real = p['solution']['value']
-                    
-                    self.assertEqual(opt, round(sol_real, SimplexProblem.DECIMAL_PRECISION))
+                    self.assertEqual(opt, self._fract_to_dec(p['solution']['value']))
                 
     def test_from_p1_to_p2(self):
         pass #TODO
