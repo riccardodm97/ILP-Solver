@@ -3,6 +3,8 @@ from lib.utility import SimplexSolution
 
 class SimplexProblem:
 
+    DECIMAL_PRECISION = 13
+
     def __init__(self, obj_func_coefficent, coefficent_matrix, constant_terms):
         self.c = np.array(obj_func_coefficent)
         self.A = np.array(coefficent_matrix)
@@ -118,7 +120,7 @@ class SimplexArtificialProblem(SimplexProblem):
             ent_var = None 
             for var in self.out_basis[~np.isin(self.out_basis,self.artificial_vars)]:
                 Aj = self.get_Aj(var)
-                if Aj[idx] != 0:
+                if round(Aj[idx], SimplexProblem.DECIMAL_PRECISION) != 0:
                     # var entering
                     self.in_basis[idx] = var
                     self.update_carry(idx,Aj)
@@ -174,7 +176,7 @@ def simplex_algorithm(c, A, b): #TODO SimplexProblem as argument?
     if ret_type is SimplexSolution.FINITE:
         solution = np.zeros(problem.c.size)
         solution[problem.in_basis] = problem.get_xb()
-        return ret_type, -problem.get_z()[0], solution # TODO: Check if has sense
+        return ret_type, round(-problem.get_z()[0], SimplexProblem.DECIMAL_PRECISION), np.around(solution, SimplexProblem.DECIMAL_PRECISION) # TODO: Check if has sense
     else:
         return ret_type, None, None
 
@@ -214,7 +216,7 @@ def phase1(p : SimplexProblem):
         cost,ent_var = p1.determine_entering_var()
         lin_dep_rows = None
         if cost == None:                                    #no negative cost found
-            if p1.get_z()[0] != 0 :                               #TODO: cosa succede se minore di zero 
+            if round(p1.get_z()[0], SimplexProblem.DECIMAL_PRECISION) != 0 :                               #TODO: cosa succede se minore di zero 
                 return SimplexSolution.IMPOSSIBLE
             elif p1.check_basis():   
                 lin_dep_rows = p1.substitute_artificial_vars()   
