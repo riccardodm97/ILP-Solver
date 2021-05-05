@@ -227,6 +227,9 @@ def phase1(p : SimplexProblem):
 
         #determine exiting var 
         Aj,ext_var_index = p1.determine_exiting_var(ent_var)
+        
+        if Aj is None:
+            return SimplexSolution.UNLIMITED #TODO: Check
 
         #ent_var entering basis , ext_var leaving
         p1.swap_vars(ext_var_index,ent_var)        
