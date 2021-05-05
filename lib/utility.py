@@ -1,5 +1,11 @@
 import numpy as np
 import json
+from enum import Enum
+
+class SimplexSolution(Enum):
+    FINITE = 1
+    UNLIMITED = 2
+    IMPOSSIBLE = 3
   
 def deserialize_problem(file_path):
     with open(file_path) as json_file:

@@ -11,8 +11,8 @@ c1 = [2, -3, 1, -4, 1, 0]
 
 b1 = [4,2,1]
 
-simplex_algorithm(c1, A1, b1)
-
+ret = simplex_algorithm(c1, A1, b1)
+print(ret)
 
 
 A2 = [
@@ -25,4 +25,5 @@ c2 = [-1, 1, -2, 3]
 
 b2 = [4,6,10]
 
-simplex_algorithm(c2, A2, b2)
+ret = simplex_algorithm(c2, A2, b2)
+print(ret)
