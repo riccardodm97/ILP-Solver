@@ -6,6 +6,7 @@ class SimplexSolution(Enum):
     FINITE = 1
     UNLIMITED = 2
     IMPOSSIBLE = 3
+    #TODO: MAX_ITERATIONS_REACHED = 4 ?
   
 def deserialize_problem(file_path):
     with open(file_path) as json_file:
