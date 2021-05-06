@@ -229,7 +229,8 @@ def phase1(p : SimplexProblem):
         Aj,ext_var_index = p1.determine_exiting_var(ent_var)
         
         if Aj is None:
-            return SimplexSolution.UNLIMITED #TODO: Check
+            # Raising exception as this case should not be achievable
+            raise ArithmeticError
 
         #ent_var entering basis , ext_var leaving
         p1.swap_vars(ext_var_index,ent_var)        
