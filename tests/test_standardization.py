@@ -20,7 +20,7 @@ class TestStandardization(unittest.TestCase):
             problem, A, b, c = deserialize_problem(p)
 
             if 'standard' in problem['solution']:
-                std_problem = get_standard_form(problem, A, b, c)
+                std_problem, chg = get_standard_form(problem, A, b, c)
                 std_real = np.array(problem['solution']['standard'])
                 self.assertEqual(std_problem.shape, std_real.shape)
 

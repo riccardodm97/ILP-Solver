@@ -79,7 +79,7 @@ class TestSimplex(unittest.TestCase):
         problems = []
         for p in [self._get_base_dir()+'/res/problem'+str(i)+'.json' for i in range(1, 8)]:
             problem, A, b, c = deserialize_problem(p)
-            std_problem = get_standard_form(problem, A, b, c)
+            std_problem, _ = get_standard_form(problem, A, b, c)
             problems.append((problem, std_problem[1:,:-1], std_problem[1:,-1], std_problem[0,0:-1]))
 
         return problems
@@ -220,15 +220,15 @@ class TestSimplexFunctions(TestSimplex):
                 self.assertEqual(ret.value, p['solution']['type'])
 
             if ret is SimplexSolution.FINITE:
-                if 'basis' in p['solution']:
-                    arr = self._fract_to_dec(np.array(p['solution']['basis']))
+                if 'values' in p['solution']['standard']:
+                    arr = self._fract_to_dec(np.array(p['solution']['standard']['values']))
                     
                     self.assertEqual(sol.shape, arr.shape)
                     if sol.shape == arr.shape:
                         self.assertTrue((sol == arr).all())
 
                 if 'value' in p['solution']:
-                    self.assertEqual(opt, self._fract_to_dec(p['solution']['value']))
+                    self.assertEqual(opt, self._fract_to_dec(p['solution']['standard']['optimum']))
                 
     def test_from_p1_to_p2(self):
         pass #TODO
