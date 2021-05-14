@@ -168,7 +168,7 @@ def simplex_algorithm(c, A, b):                                                 
     #if cannot find starting basis phase1 is needed 
     if problem.check_basis():
         ret_type = phase1(problem)                  
-        if ret_type in [SimplexSolution.IMPOSSIBLE, SimplexSolution.UNLIMITED]:
+        if ret_type is SimplexSolution.IMPOSSIBLE:
             return ret_type, None, None                                                                                                         # TODO: Check if has sense
     
     ret_type = phase2(problem)
