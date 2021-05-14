@@ -1,0 +1,33 @@
+{
+    "objective": {
+        "costs": [-3, 1, 6, -2],
+        "optimization": "MAX"
+    },
+    "constraints": [
+        {
+            "coefficients": [-2, -3, -1, 2],
+            "constant": -3,
+            "type": "EQ"
+        },
+        {
+            "coefficients": [2, -2, 2, 4],
+            "constant": 4,
+            "type": "EQ"
+        }
+    ],
+    "non-negatives": [0, 1, 3],
+    "non-positives": [2],
+    "solution": {
+        "standard": {
+            "form": [
+                [3, -1, 6, 2, 0],
+                [2, 3, -1, -2, 3],
+                [2, -2, -2, 4, 4]
+            ],
+            "values": [0, "5/2", 0, "9/4"]
+        },
+        "values": [0, "5/2", 0, "9/4"],
+        "optimum": -2,
+        "type": 1
+    }
+}

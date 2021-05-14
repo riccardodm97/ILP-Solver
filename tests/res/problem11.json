@@ -1,0 +1,39 @@
+{
+    "objective": {
+        "costs": [2, 3, -12],
+        "optimization": "MAX"
+    },
+    "constraints": [
+        {
+            "coefficients": [1, -1, 4],
+            "constant": -2,
+            "type": "GEQ"
+        },
+        {
+            "coefficients": [2, 2, -6],
+            "constant": 4,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [1, -1, 0],
+            "constant": 2,
+            "type": "LEQ"
+        }
+    ],
+    "non-negatives": [0, 1],
+    "non-positives": [2],
+    "solution": {
+        "standard": {
+            "form": [
+                [-2, -3, -12, 0, 0, 0, 0],
+                [-1, 1, 4, 1, 0, 0, 2],
+                [2, 2, 6, 0, 1, 0, 4],
+                [1, -1, 0, 0, 0, 1, 2]
+            ],
+            "values": ["2/7", 0, "4/7", 0, 0, "12/7"]
+        },
+        "values": ["2/7", 0, "-4/7"],
+        "optimum": "52/7",
+        "type": 1
+    }
+}

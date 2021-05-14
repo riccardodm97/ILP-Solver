@@ -1,7 +1,7 @@
 {
     "objective": {
         "costs": [7, 2, 5, -1],
-        "optmimization": "MIN"
+        "optimization": "MIN"
     },
     "constraints": [
         {
@@ -18,12 +18,17 @@
     "non-negatives": [0, 1, 3],
     "non-positives": [2],
     "solution": {
-        "standard": [
-            [7, 2, -5, -1, 0, 0, 0],
-            [4, 3, 0, 2, 1, 0, 2],
-            [1, -3, 1, 0, 0, 1, 1]
-        ],
-        "basis": [0, "2/3", 3, 0, 0, 0],
-        "value": "-41/3"
+        "standard": {
+            "form": [
+                [7, 2, -5, -1, 0, 0, 0],
+                [4, 3, 0, 2, 1, 0, 2],
+                [1, -3, 1, 0, 0, 1, 1]
+            ],
+            "values": [0, "2/3", 3, 0, 0, 0],
+            "optimum": "-41/3"
+        },
+        "values": [0, "2/3", -3, 0],
+        "optimum": "-41/3",
+        "type": 1
     }
 }

@@ -1,15 +1,29 @@
-from lib.simplex import SupportData, start_simplex
+from lib.simplex import simplex_algorithm
 
-A = [
-    [1, 1, 1, -1, 0, 0],
-    [2, 0, -1, 1, 1, 0],
-    [3, 0, 1, 2, 0, 1]
+
+A1 = [
+    [1,  1,  1, -1,  0,  0],
+    [2,  0, -1,  1,  1,  0],
+    [3,  0,  1,  2,  0,  1]
 ]
 
-c = [2, -3, 1, -4, 1, 0]
+c1 = [2, -3, 1, -4, 1, 0]
 
-b = [4, 2, 1]
+b1 = [4,2,1]
 
-problem = SupportData(c, A, b)
-solution = start_simplex(problem)
-print(solution)
+ret = simplex_algorithm(c1, A1, b1)
+print(ret)
+
+
+A2 = [
+    [1, -1, 3, 2],
+    [2, 1, -3, 3],
+    [3, 0, 0, 5]
+]
+
+c2 = [-1, 1, -2, 3]
+
+b2 = [4,6,10]
+
+ret = simplex_algorithm(c2, A2, b2)
+print(ret)
