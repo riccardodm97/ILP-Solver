@@ -80,11 +80,11 @@ class SimplexProblem:
         if (Aj<=0).all() :                            #unlimited problem            
             return None,None 
 
-        arr = self.get_xb()/Aj
-        positives = np.where(arr > 0, arr, np.inf)
-        h = np.where(positives == positives.min())
+        positives = np.where(Aj > 0, self.get_xb()/Aj, np.inf)
+        #TODO What if all negatives or Aj is 0?
+        h = np.where(positives == positives.min())[0]
 
-        out_index = h[self.in_basis[h].argmin()][0]     #BLAND rule
+        out_index = h[self.in_basis[h].argmin()]     #BLAND rule
         
         return Aj,out_index
 
