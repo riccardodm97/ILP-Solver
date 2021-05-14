@@ -1,7 +1,7 @@
 {
     "objective": {
         "costs": [130, 100],
-        "optmimization": "MAX"
+        "optimization": "MAX"
     },
     "constraints": [
         {
