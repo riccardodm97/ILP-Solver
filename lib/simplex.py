@@ -157,7 +157,7 @@ def define_artificial_problem(p):
     
     return obj_func,coeff_matrix,constant_terms,artificial_variables
 
-def simplex_algorithm(c, A, b): #TODO SimplexProblem as argument?
+def simplex_algorithm(c, A, b):                                                                                                                #TODO: SimplexProblem as argument?
     #create object 
     problem = SimplexProblem(c, A, b)
 
@@ -169,7 +169,7 @@ def simplex_algorithm(c, A, b): #TODO SimplexProblem as argument?
     if problem.check_basis():
         ret_type = phase1(problem)                  
         if ret_type in [SimplexSolution.IMPOSSIBLE, SimplexSolution.UNLIMITED]:
-            return ret_type, None, None # TODO: Check if has sense
+            return ret_type, None, None                                                                                                         # TODO: Check if has sense
     
     ret_type = phase2(problem)
     print("\nthe optimum value is",-problem.get_z()[0])
@@ -177,16 +177,16 @@ def simplex_algorithm(c, A, b): #TODO SimplexProblem as argument?
     if ret_type is SimplexSolution.FINITE:
         solution = np.zeros(problem.c.size)
         solution[problem.in_basis] = problem.get_xb()
-        return ret_type, round(-problem.get_z()[0], SimplexProblem.DECIMAL_PRECISION), np.around(solution, SimplexProblem.DECIMAL_PRECISION) # TODO: Check if has sense
+        return ret_type, round(-problem.get_z()[0], SimplexProblem.DECIMAL_PRECISION), np.around(solution, SimplexProblem.DECIMAL_PRECISION)    # TODO: Check if has sense
     else:
         return ret_type, None, None
 
-def from_p1_to_p2(p1,p,lin_dep_rows):
+def from_p1_to_p2(p1 : SimplexArtificialProblem,p : SimplexProblem,lin_dep_rows):
     if lin_dep_rows is not None :
         #modify original problem data
         p.A = np.delete(p.A, lin_dep_rows, axis=0)
         p.b = np.delete(p.b,lin_dep_rows)
-        #modify phase1 dara
+        #modify phase1 data
         p1.set_carry_matrix(np.delete(p1.carry_matrix, lin_dep_rows+1 , axis=0))   #delete rows from carry
         p1.set_carry_matrix(np.delete(p1.carry_matrix, lin_dep_rows, axis=1))      #delete columns from carry
         p1.in_basis = np.delete(p1.in_basis,lin_dep_rows)                          #remove not needed in basis variable 
@@ -216,8 +216,8 @@ def phase1(p : SimplexProblem):
         #compute reduced costs and determine entering var 
         cost,ent_var = p1.determine_entering_var()
         lin_dep_rows = None
-        if cost == None:                                    #no negative cost found
-            if round(p1.get_z()[0], SimplexProblem.DECIMAL_PRECISION) != 0 :                               #TODO: cosa succede se minore di zero 
+        if cost == None:            #no negative cost found
+            if round(p1.get_z()[0], SimplexProblem.DECIMAL_PRECISION) != 0 :                                                                       #TODO: what if <0 ? 
                 return SimplexSolution.IMPOSSIBLE
             elif p1.check_basis():   
                 lin_dep_rows = p1.substitute_artificial_vars()   
