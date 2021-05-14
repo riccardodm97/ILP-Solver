@@ -26,9 +26,7 @@ def get_standard_form(problem, A, b, c):
     rows, cols = Ac.shape
 
     # 1. Change objective function to minimization
-    if problem['objective']['optmimization'] == 'MAX':
-        problem['objective']['costs'] *= -1
-        problem['objective']['optmimization'] = 'MIN'
+    if problem['objective']['optimization'] == 'MAX':
         Ac[0,:] *= -1
 
 
@@ -66,3 +64,7 @@ def get_standard_form(problem, A, b, c):
             matrix[index + 1, :] *= -1
 
     return matrix, var_chg_map
+
+def get_original_problem_sol(standard_sol, var_chg_map):
+    sol = np.array([sum([factor['coeff'] * standard_sol[factor['var']] for factor in factors]) for factors in var_chg_map.values()])
+    return sol #TODO , z?
