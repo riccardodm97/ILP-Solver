@@ -4,7 +4,7 @@ from fractions import Fraction
 import os
 
 from lib.simplex import *
-from lib.utility import deserialize_problem, get_standard_form
+from lib.utility import deserialize_problem, get_original_problem_sol, get_standard_form
 
 class TestSimplex(unittest.TestCase):
         
@@ -77,10 +77,13 @@ class TestSimplex(unittest.TestCase):
 
     def _load_problems(self):
         problems = []
-        for p in [self._get_base_dir()+'/res/problem'+str(i)+'.json' for i in range(1, 8)]:
+        for p in [self._get_base_dir()+'/res/problem'+str(i)+'.json' for i in range(1, 16)]:
+            if p in [self._get_base_dir()+'/res/problem'+str(i)+'.json' for i in [9, 11, 13, 15]]:
+                x = 1 #TODO Fix
+                continue
             problem, A, b, c = deserialize_problem(p)
-            std_problem, _ = get_standard_form(problem, A, b, c)
-            problems.append((problem, std_problem[1:,:-1], std_problem[1:,-1], std_problem[0,0:-1]))
+            std_problem, var_chg_map = get_standard_form(problem, A, b, c)
+            problems.append((problem, std_problem[1:,:-1], std_problem[1:,-1], std_problem[0,0:-1], var_chg_map))
 
         return problems
 
@@ -213,11 +216,14 @@ class TestSimplexFunctions(TestSimplex):
     
     def test_simplex_algorithm(self):
         problems = self._load_problems()
-        for p, A, b, c in problems:
+        for p, A, b, c, var_chg_map in problems:
+            print("Solving problem:", p['objective']['optimization'], "z ="," + ".join([str(x) + "x" + str(i+1) for i, x in enumerate(p['objective']['costs'])]))
             ret, opt, sol = simplex_algorithm(c, A, b)
 
             if 'type' in p['solution']:
                 self.assertEqual(ret.value, p['solution']['type'])
+            else:
+                print("Value not specified")
 
             if ret is SimplexSolution.FINITE:
                 if 'values' in p['solution']['standard']:
@@ -226,9 +232,30 @@ class TestSimplexFunctions(TestSimplex):
                     self.assertEqual(sol.shape, arr.shape)
                     if sol.shape == arr.shape:
                         self.assertTrue((sol == arr).all())
+                else:
+                    print("Value not specified")
 
-                if 'value' in p['solution']:
+                if 'values' in p['solution']:
+                    sol = get_original_problem_sol(sol, var_chg_map)
+                    arr = self._fract_to_dec(np.array(p['solution']['values']))
+
+                    self.assertEqual(sol.shape, arr.shape)
+                    if sol.shape == arr.shape:
+                        self.assertTrue((sol == arr).all())
+                else:
+                    print("Value not specified")
+
+
+                if 'optimum' in p['solution']['standard']:
                     self.assertEqual(opt, self._fract_to_dec(p['solution']['standard']['optimum']))
+                else:
+                    print("Value not specified")
+
+                if 'optimum' in p['solution'] and False:
+                    #TODO: -opt if max problem
+                    self.assertEqual(opt, self._fract_to_dec(p['solution']['optimum']))
+                else:
+                    print("Value not specified")
                 
     def test_from_p1_to_p2(self):
         pass #TODO
