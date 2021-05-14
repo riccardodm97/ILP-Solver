@@ -78,9 +78,6 @@ class TestSimplex(unittest.TestCase):
     def _load_problems(self):
         problems = []
         for p in [self._get_base_dir()+'/res/problem'+str(i)+'.json' for i in range(1, 16)]:
-            if p in [self._get_base_dir()+'/res/problem'+str(i)+'.json' for i in [9, 11, 13, 15]]:
-                x = 1 #TODO Fix
-                continue
             problem, A, b, c = deserialize_problem(p)
             std_problem, var_chg_map = get_standard_form(problem, A, b, c)
             problems.append((problem, std_problem[1:,:-1], std_problem[1:,-1], std_problem[0,0:-1], var_chg_map))
