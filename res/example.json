@@ -1,7 +1,7 @@
 {
     "objective": {
         "costs": [2, -3, 1, -4, 1, 0],
-        "optmimization": "MIN"
+        "optimization": "MIN"
     },
     "constraints": [
         {
