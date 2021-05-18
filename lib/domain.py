@@ -1,16 +1,9 @@
-from lib.simplex import SimplexSolution, SimplexProblem, phase1, phase2, simplex_algorithm
+from lib.bb import bb_algorithm
+from lib.simplex import SimplexProblem, phase1, phase2, simplex_algorithm
+from lib.utils import DomainConstraintType, DomainOptimizationType, SimplexSolution
 import numpy as np
 from enum import Enum
 import json
-
-class DomainConstraintType(Enum):
-    LESS_EQUAL = 1
-    GREAT_EQUAL = 2
-    EQUAL = 3
-
-class DomainOptimizationType(Enum):
-    MAX = 1
-    MIN = 2
 
 class DomainProblem:
 
@@ -20,6 +13,8 @@ class DomainProblem:
         self.non_negatives = non_negatives
         self.non_positives = non_positives
         self.optimization_type = optimization_type
+
+        self.is_integer = True
 
     @staticmethod
     def from_matrix(matrix, type=DomainOptimizationType.MIN, non_negatives=[], non_positives=[]):
@@ -111,7 +106,11 @@ class DomainProblem:
 
     def solve(self):
         standard_matrix, var_chg_map = self.get_standard_form()
-        ret, std_opt, std_sol = simplex_algorithm(standard_matrix[0,:-1], standard_matrix[1:,:-1], standard_matrix[1:,-1])
+
+        if self.is_integer:
+            ret, std_opt, std_sol = bb_algorithm(standard_matrix, var_chg_map, self.optimization_type)
+        else:
+            ret, std_opt, std_sol = simplex_algorithm(standard_matrix[0,:-1], standard_matrix[1:,:-1], standard_matrix[1:,-1])
 
         if ret is SimplexSolution.FINITE:
             opt, sol = self.get_problem_sol(std_opt, std_sol, var_chg_map)
