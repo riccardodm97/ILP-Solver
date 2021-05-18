@@ -1,5 +1,11 @@
+from enum import Enum
 import numpy as np
-from lib.utility import SimplexSolution
+
+class SimplexSolution(Enum):
+    FINITE = 1
+    UNLIMITED = 2
+    IMPOSSIBLE = 3
+    #TODO: MAX_ITERATIONS_REACHED = 4 ?
 
 class SimplexProblem:
 
