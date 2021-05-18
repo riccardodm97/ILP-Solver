@@ -1,6 +1,7 @@
 import math
 from collections import deque
 import numpy as np
+from typing import Tuple
 
 from lib.utils import SimplexSolution, DomainOptimizationType
 from lib.simplex import simplex_algorithm
@@ -9,18 +10,18 @@ class BBNode:
     def __init__(self, std_problem, variables, coefficients, val, slack_coeff, var_chg_map):
         self.std_problem = std_problem.copy()
         self.var_chg_map = var_chg_map
-        self.children_left, self.children_right = None, None
+        self.child_left, self.child_right = None, None
         self.sol = None
         self.opt = None
 
         if variables is not None:
             rows, cols = self.std_problem.shape
-            new_row = np.zeros(cols)
+            new_row = np.zeros(cols+1)
             new_row[variables] = coefficients
             new_row[-1] = val
             new_row[-2] = slack_coeff
 
-            self.std_problem = np.hstack((self.std_problem[:,:-1], np.expand_dims(np.zeros(rows), axis=1), self.std_problem[:,-1:]))
+            self.std_problem = np.c_[self.std_problem[:,:-1], np.zeros(rows), self.std_problem[:,-1]]
             self.std_problem = np.r_[self.std_problem, [new_row]]
 
     def solve(self, optimization_type):
@@ -44,7 +45,7 @@ class BBTree:
 
         self.best_node = None
 
-    def solve(self):
+    def solve(self) -> Tuple[SimplexSolution,BBNode] :
         while self.working_memory:
             node = self.working_memory.popleft()
             ret_type = node.solve(self.optimization_type)
@@ -63,19 +64,17 @@ class BBTree:
 
         return SimplexSolution.FINITE if self.best_node is not None else SimplexSolution.IMPOSSIBLE, self.best_node
 
-    def is_worse(self, node):
+    def is_worse(self, node : BBNode) -> bool:
         if self.best_node is None:
             return False
         return node.opt <= self.best_node.opt if self.optimization_type == DomainOptimizationType.MAX else node.opt >= self.best_node.opt 
 
-    def branch(self, node):
-        for index, x in enumerate(node.sol):
-            if x % 1 != x:
-                var = index
-        # var = np.where(np.mod(node.sol, 1) == True)[0]  #TODO: Branching Strategy
-        val = node.sol[var]
-        variables = [d['var'] for d in self.var_chg_map[var]]
-        coefficients = [d['coeff'] for d in self.var_chg_map[var]]
+    def branch(self, node : BBNode):
+        idx=np.argmax(node.sol-np.trunc(node.sol))
+        val = node.sol[idx]
+
+        variables = [d['var'] for d in self.var_chg_map[idx]]
+        coefficients = [d['coeff'] for d in self.var_chg_map[idx]]
 
         node.child_left = BBNode(node.std_problem, variables, coefficients, math.floor(val), 1, self.var_chg_map)
         node.child_right = BBNode(node.std_problem, variables, coefficients, math.ceil(val), -1, self.var_chg_map)

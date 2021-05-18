@@ -158,7 +158,7 @@ def define_artificial_problem(p):
     return obj_func,coeff_matrix,constant_terms,artificial_variables
 
 def simplex_algorithm(c, A, b):  
-    print("Starting simplex - \nc:", c, "\nA:", A, "\nb:", b)                                                                                                              #TODO: SimplexProblem as argument?
+    print("Starting simplex - \nc:", c, "\nA:", A, "\nb:", b)                                                                                  #TODO: SimplexProblem as argument?
     #create object 
     problem = SimplexProblem(c, A, b)
 
