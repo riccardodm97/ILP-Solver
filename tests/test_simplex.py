@@ -79,8 +79,9 @@ class TestSimplex(unittest.TestCase):
     def _load_problems(self):
         problems = []
         for p in [self._get_base_dir()+'/res/problem'+str(i)+'.json' for i in range(1, 16)]:
-            problem = json.load(p)
-            problems.append((DomainProblem.from_json(p), problem['solution']))
+            with open(p) as json_file:
+                problem = json.load(json_file)
+                problems.append((DomainProblem.from_json(p), problem['solution']))
 
         return problems
 
