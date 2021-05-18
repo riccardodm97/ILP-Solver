@@ -75,7 +75,6 @@ class TestSimplex(unittest.TestCase):
 
         return SimplexProblem(c, A, b)
 
-
     def _load_problems(self):
         problems = []
         for p in [self._get_base_dir()+'/res/problem'+str(i)+'.json' for i in range(1, 16)]:
