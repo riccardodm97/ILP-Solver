@@ -2,9 +2,9 @@ import unittest
 import numpy as np 
 from fractions import Fraction
 import os
+import json
 
 from lib.simplex import *
-from lib.utility import deserialize_problem, get_original_problem_sol, get_standard_form
 from lib.domain import DomainProblem
 
 class TestSimplex(unittest.TestCase):
@@ -76,15 +76,11 @@ class TestSimplex(unittest.TestCase):
         return SimplexProblem(c, A, b)
 
 
-    def _load_problems(self, domain_problem=False):
+    def _load_problems(self):
         problems = []
         for p in [self._get_base_dir()+'/res/problem'+str(i)+'.json' for i in range(1, 16)]:
-            problem, A, b, c = deserialize_problem(p)
-            if domain_problem:
-                problems.append((DomainProblem.from_json(p), problem))
-            else:
-                std_problem, _ = get_standard_form(problem, A, b, c)
-                problems.append((problem, std_problem[1:,:-1], std_problem[1:,-1], std_problem[0,0:-1]))
+            problem = json.load(p)
+            problems.append((DomainProblem.from_json(p), problem['solution']))
 
         return problems
 
@@ -215,37 +211,21 @@ class TestSimplexFunctions(TestSimplex):
             #self.assertFalse((ap.in_basis == -1).any())
             # TODO ap should have more coefficients than
     
-    def test_simplex_algorithm(self):
-        for p, A, b, c in self._load_problems():
-            print("Solving problem:", p['objective']['optimization'], "z ="," + ".join([str(x) + "x" + str(i+1) for i, x in enumerate(p['objective']['costs'])]))
-            ret, std_opt, std_sol = simplex_algorithm(c, A, b)
-
-            self.assertEqual(ret.value, p['solution']['type'])
-
-            if ret is SimplexSolution.FINITE:
-                arr = self._fract_to_dec(np.array(p['solution']['standard']['values']))
-                
-                self.assertEqual(std_sol.shape, arr.shape)
-                if std_sol.shape == arr.shape:
-                    self.assertTrue((std_sol == arr).all())
-                
-                self.assertEqual(std_opt, self._fract_to_dec(p['solution']['standard']['optimum']))
-    
     def test_domain_problem_solve(self):
-        for dp, p in self._load_problems(domain_problem=True):
+        for dp, solution in self._load_problems():
             #print("Solving problem:", dp.optimization_type, "z ="," + ".join([str(x) + "x" + str(i+1) for i, x in enumerate(dp.costs)]))
             ret, opt, sol = dp.solve()
 
-            self.assertEqual(ret.value, p['solution']['type'])
+            self.assertEqual(ret.value, solution['type'])
 
             if ret is SimplexSolution.FINITE:
-                arr = self._fract_to_dec(np.array(p['solution']['values']))
+                arr = self._fract_to_dec(np.array(solution['values']))
 
                 self.assertEqual(sol.shape, arr.shape)
                 if sol.shape == arr.shape:
                     self.assertTrue((sol == arr).all())
 
-                self.assertEqual(opt, self._fract_to_dec(p['solution']['optimum']))
+                self.assertEqual(opt, self._fract_to_dec(solution['optimum']))
                 
     def test_from_p1_to_p2(self):
         pass #TODO

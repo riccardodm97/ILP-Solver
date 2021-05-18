@@ -1,5 +1,4 @@
-from lib.utility import SimplexSolution
-from lib.simplex import SimplexProblem, phase1, phase2, simplex_algorithm
+from lib.simplex import SimplexSolution, SimplexProblem, phase1, phase2, simplex_algorithm
 import numpy as np
 from enum import Enum
 import json
