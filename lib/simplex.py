@@ -1,11 +1,6 @@
 from enum import Enum
+from lib.utils import SimplexSolution
 import numpy as np
-
-class SimplexSolution(Enum):
-    FINITE = 1
-    UNLIMITED = 2
-    IMPOSSIBLE = 3
-    #TODO: MAX_ITERATIONS_REACHED = 4 ?
 
 class SimplexProblem:
 
@@ -162,7 +157,8 @@ def define_artificial_problem(p):
     
     return obj_func,coeff_matrix,constant_terms,artificial_variables
 
-def simplex_algorithm(c, A, b):                                                                                                                #TODO: SimplexProblem as argument?
+def simplex_algorithm(c, A, b):  
+    print("Starting simplex - \nc:", c, "\nA:", A, "\nb:", b)                                                                                                              #TODO: SimplexProblem as argument?
     #create object 
     problem = SimplexProblem(c, A, b)
 
@@ -177,13 +173,14 @@ def simplex_algorithm(c, A, b):                                                 
             return ret_type, None, None                                                                                                         # TODO: Check if has sense
     
     ret_type = phase2(problem)
-    print("\nthe optimum value is",-problem.get_z()[0])
 
     if ret_type is SimplexSolution.FINITE:
+        print("\nthe optimum value is",-problem.get_z()[0])
         solution = np.zeros(problem.c.size)
         solution[problem.in_basis] = problem.get_xb()
         return ret_type, round(-problem.get_z()[0], SimplexProblem.DECIMAL_PRECISION), np.around(solution, SimplexProblem.DECIMAL_PRECISION)    # TODO: Check if has sense
     else:
+        print("\nsolution is not finite")
         return ret_type, None, None
 
 def from_p1_to_p2(p1 : SimplexArtificialProblem,p : SimplexProblem,lin_dep_rows):
