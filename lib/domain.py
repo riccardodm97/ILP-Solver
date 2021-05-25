@@ -7,28 +7,27 @@ import json
 
 class DomainProblem:
 
-    def __init__(self, costs, optimization_type, constraints, non_negatives=[], non_positives=[]):
+    def __init__(self, costs, optimization_type, constraints, non_negatives=[], non_positives=[], is_integer=False):
         self.costs = costs
         self.constraints = constraints
         self.non_negatives = non_negatives
         self.non_positives = non_positives
         self.optimization_type = optimization_type
-
-        self.is_integer = True
+        self.is_integer = is_integer
 
     @staticmethod
-    def from_matrix(matrix, type=DomainOptimizationType.MIN, non_negatives=[], non_positives=[]):
+    def from_matrix(matrix, type=DomainOptimizationType.MIN, non_negatives=[], non_positives=[], is_integer=False):
         A, b, c = matrix[1:,:-1], matrix[:,-1], matrix[0,:]
 
-        return DomainProblem.from_abc(A, b, c, type, non_negatives, non_positives)
+        return DomainProblem.from_abc(A, b, c, type, non_negatives, non_positives, is_integer)
 
     @staticmethod
-    def from_abc(A, b, c, type=DomainOptimizationType.MIN, non_negatives=[], non_positives=[]):
+    def from_abc(A, b, c, type=DomainOptimizationType.MIN, non_negatives=[], non_positives=[], is_integer=False):
         constraints = []
         for coefficients, constant in zip(A, b):
             constraints.append(DomainConstraint(coefficients, constant, DomainConstraintType.EQUAL))
 
-        return DomainProblem(np.array(c), type, constraints, non_negatives, non_positives)
+        return DomainProblem(np.array(c), type, constraints, non_negatives, non_positives, is_integer)
 
     @staticmethod
     def from_json(filename):
@@ -47,7 +46,7 @@ class DomainProblem:
         return DomainProblem(np.array(problem['objective']['costs']), {
             'MIN': DomainOptimizationType.MIN,
             'MAX': DomainOptimizationType.MAX
-        }[problem['objective']['optimization']], constraints, problem['non-negatives'], problem.get('non-positives', []))
+        }[problem['objective']['optimization']], constraints, problem['non-negatives'], problem.get('non-positives', []), problem.get('integer', False))
 
     def get_constraint_array(self):
         return np.array([c.coefficients for c in self.constraints]) #TODO: Property?
