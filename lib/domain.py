@@ -1,3 +1,4 @@
+from lib import logger
 from lib.bb import bb_algorithm
 from lib.simplex import SimplexProblem, phase1, phase2, simplex_algorithm
 from lib.utils import DomainConstraintType, DomainOptimizationType, SimplexSolution
@@ -55,12 +56,14 @@ class DomainProblem:
         return np.array([c.constant for c in self.constraints]) #TODO: Property?
 
     def get_standard_form(self):
+        logger.write("Turning the problem into standard form")
         Ac = np.r_[[self.costs], self.get_constraint_array()]
         var_chg_map = {i: [{'var': i, 'coeff': 1}] for i in range(self.costs.size)}
         rows, cols = Ac.shape
 
         # 1. Change objective function to minimization
         if self.optimization_type == DomainOptimizationType.MAX:
+            logger.write("Changing the objective function into a minimization function")
             Ac[0,:] *= -1
 
 
@@ -73,9 +76,11 @@ class DomainProblem:
 
         for var in np.where(positive_variables == False):
             if var in self.non_positives:
+                logger.write("Changing the sign of the negative variable/s " + str(var))
                 Ac[:, var] *= -1
                 var_chg_map[var[0]][0]['coeff'] = -1
             elif var.size > 0:
+                logger.write("Perform variable change for variable/s " + str(var))
                 _, Ac_cols = Ac.shape
                 var_chg_map[var[0]].append({'var': Ac_cols, 'coeff': -1})
                 Ac = np.c_[Ac, Ac[:, var] * -1]
@@ -83,6 +88,7 @@ class DomainProblem:
         # 3. Add slack variables to change constraints into equations
         for index, constraint in enumerate(self.constraints):
             if constraint.type != DomainConstraintType.EQUAL:
+                logger.write("Adding slack variable for constraint " + str(index))
                 Ac = np.c_[Ac, np.zeros(rows)]
                 
                 if constraint.type == DomainConstraintType.LESS_EQUAL:
@@ -95,6 +101,7 @@ class DomainProblem:
         # 4. Constant terms should be positive or 0
         for index, const in enumerate(self.get_constants_array()):
             if const < 0:
+                logger.write("Inverting sign of constraint because of negative constant term")
                 matrix[index + 1, :] *= -1
 
         return matrix, var_chg_map
@@ -113,6 +120,8 @@ class DomainProblem:
 
         if ret is SimplexSolution.FINITE:
             opt, sol = self.get_problem_sol(std_opt, std_sol, var_chg_map)
+            logger.write("The solution of the original problem is", sol)
+            logger.write("The optimum value being", opt)
             return ret, opt, sol
         else:
             return ret, None, None

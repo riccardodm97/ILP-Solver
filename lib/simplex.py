@@ -1,5 +1,6 @@
 from enum import Enum
 from lib.utils import SimplexSolution
+from lib import logger 
 import numpy as np
 
 class SimplexProblem:
@@ -72,6 +73,7 @@ class SimplexProblem:
         for j in self.out_basis :
             cj = self.c[j] + np.dot(self.get_y(),self.A[:,j])
             if cj < 0 : 
+                logger.write("Chosen entering variable: x" + str(j))
                 return cj,j
         
         return None,None
@@ -86,6 +88,7 @@ class SimplexProblem:
 
         out_index = h[self.in_basis[h].argmin()]     #BLAND rule
         
+        logger.write("Chosen exiting variable: x" + str(self.in_basis[out_index])) #TODO Print bland rule
         return Aj,out_index
 
     def update_carry(self,h,Aj,cost=None):
@@ -158,7 +161,10 @@ def define_artificial_problem(p):
     return obj_func,coeff_matrix,constant_terms,artificial_variables
 
 def simplex_algorithm(c, A, b):  
-    print("Starting simplex - \nc:", c, "\nA:", A, "\nb:", b)                                                                                  #TODO: SimplexProblem as argument?
+    logger.write("\nStarting simplex")                                                                                  #TODO: SimplexProblem as argument?
+    logger.write("Costs:", c)
+    logger.write("Constraints:", A)
+    logger.write("Constant terms", b)
     #create object 
     problem = SimplexProblem(c, A, b)
 
@@ -168,19 +174,25 @@ def simplex_algorithm(c, A, b):
     
     #if cannot find starting basis phase1 is needed 
     if problem.check_basis():
-        ret_type = phase1(problem)                  
+        logger.write("Starting basis not found")
+        ret_type = phase1(problem)
+        logger.write("End of Phase 1")                  
+        
         if ret_type is SimplexSolution.IMPOSSIBLE:
-            return ret_type, None, None                                                                                                         # TODO: Check if has sense
+            logger.write("The problem is impossible")
+            return ret_type, None, None
+    else:
+        logger.write("Starting basis found, skipping to Phase 2")   
     
     ret_type = phase2(problem)
 
     if ret_type is SimplexSolution.FINITE:
-        print("\nthe optimum value is",-problem.get_z()[0])
         solution = np.zeros(problem.c.size)
         solution[problem.in_basis] = problem.get_xb()
+        logger.write("The solution of the standard problem is", solution)
         return ret_type, round(-problem.get_z()[0], SimplexProblem.DECIMAL_PRECISION), np.around(solution, SimplexProblem.DECIMAL_PRECISION)    # TODO: Check if has sense
     else:
-        print("\nsolution is not finite")
+        logger.write("Solution is not finite")
         return ret_type, None, None
 
 def from_p1_to_p2(p1 : SimplexArtificialProblem,p : SimplexProblem,lin_dep_rows):
@@ -198,8 +210,10 @@ def from_p1_to_p2(p1 : SimplexArtificialProblem,p : SimplexProblem,lin_dep_rows)
 
 
 def phase1(p : SimplexProblem):
+    logger.write("\nStarting Phase 1")
     #determine changes to make for artificial problem
     c,A,b,art_vars = define_artificial_problem(p)
+    logger.write("Inserting ", ", ".join(["x"+str(i) for i in art_vars]), "as artificial variables")
 
     #create object 
     p1 = SimplexArtificialProblem(c,A,b,art_vars,p.in_basis.copy())
@@ -211,7 +225,8 @@ def phase1(p : SimplexProblem):
     p1.init_carry()
 
     while True :
-
+        logger.write("\nNew basis:\n", ", ".join(["x"+str(i) for i in p1.in_basis]))
+        logger.write("New carry matrix:\n", p1.carry_matrix)
         #save out of basis vars
         p1.compute_out_of_base()
 
@@ -235,16 +250,19 @@ def phase1(p : SimplexProblem):
             raise ArithmeticError
 
         #ent_var entering basis , ext_var leaving
-        p1.swap_vars(ext_var_index,ent_var)        
+        p1.swap_vars(ext_var_index,ent_var)     
 
         #modify carry matrix 
         p1.update_carry(ext_var_index,Aj,cost)
 
 def phase2(p : SimplexProblem):
+    logger.write("\nStarting Phase 2")
 
     p.init_carry()
 
     while True :
+        logger.write("\nNew basis:\n", ", ".join(["x"+str(i) for i in p.in_basis]))
+        logger.write("New carry matrix:\n", p.carry_matrix)
 
         #save out of basis vars
         p.compute_out_of_base()
@@ -252,13 +270,15 @@ def phase2(p : SimplexProblem):
         #compute reduced costs and determine entering var 
         cost,ent_var = p.determine_entering_var()
         if cost == None: 
+            logger.write("\nOptimum found")
             return SimplexSolution.FINITE
-        
+            
         #determine exiting var 
         Aj,ext_var_index = p.determine_exiting_var(ent_var)
         if Aj is None:
+            logger.write("\Unlimited problem")
             return SimplexSolution.UNLIMITED
-        
+
         #ent_var entering basis , ext_var leaving
         p.swap_vars(ext_var_index,ent_var)        
 
