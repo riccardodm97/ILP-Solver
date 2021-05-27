@@ -276,7 +276,7 @@ def phase2(p : SimplexProblem):
         #determine exiting var 
         Aj,ext_var_index = p.determine_exiting_var(ent_var)
         if Aj is None:
-            logger.write("\Unlimited problem")
+            logger.write("\nUnlimited problem")
             return SimplexSolution.UNLIMITED
 
         #ent_var entering basis , ext_var leaving
