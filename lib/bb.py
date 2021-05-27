@@ -41,7 +41,7 @@ class BBNode:
         return np.all(np.mod(self.sol, 1) == 0)
     
     def __lt__(self, other):
-        return self.opt > other.opt
+        return self.opt > other.opt             #TODO optimization type involved : to be changed
 
 
 class BBTree:
