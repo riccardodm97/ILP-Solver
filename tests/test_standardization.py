@@ -2,7 +2,7 @@ import unittest
 import os 
 import numpy as np
 
-from lib.utility import deserialize_problem, get_standard_form
+from lib.utils import deserialize_problem, get_standard_form
 
 class TestStandardization(unittest.TestCase):
 
