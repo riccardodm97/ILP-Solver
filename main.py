@@ -29,28 +29,28 @@ from lib.simplex import simplex_algorithm
 # ret = simplex_algorithm(c2, A2, b2)
 # print(ret)
 
-A3 = [
-    [2, 4, 1, 0, 0],
-    [1, 0, 0, 1, 0],
-    [0, 2, 0, 0, 1]
-]
-
-c3 = [-3, -5, 0, 0, 0]
-
-b3 = [25, 8, 10]
-
-dp = DomainProblem.from_abc(A3,b3,c3,non_negatives=[0,1,2,3,4],is_integer=True)
-dp.solve()
-
-
-# A4 = [
-#     [1, 1, 1, 0],
-#     [10, 6, 0, 1],
+# A3 = [
+#     [2, 4, 1, 0, 0],
+#     [1, 0, 0, 1, 0],
+#     [0, 2, 0, 0, 1]
 # ]
 
-# c4 = [5, 17/4, 0, 0]
+# c3 = [-3, -5, 0, 0, 0]
 
-# b4 = [5, 45]
+# b3 = [25, 8, 10]
 
-# dp = DomainProblem.from_abc(A4,b4,c4,type=DomainOptimizationType.MAX,non_negatives=[0,1,2,3],is_integer=True)
+# dp = DomainProblem.from_abc(A3,b3,c3,non_negatives=[0,1,2,3,4],is_integer=True)
 # dp.solve()
+
+
+A4 = [
+    [1, 1, 1, 0],
+    [10, 6, 0, 1],
+]
+
+c4 = [5, 17/4, 0, 0]
+
+b4 = [5, 45]
+
+dp = DomainProblem.from_abc(A4,b4,c4,type=DomainOptimizationType.MAX,non_negatives=[0,1,2,3],is_integer=True)
+dp.solve()

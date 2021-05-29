@@ -32,10 +32,13 @@ class BBNode:
 
     def solve(self):
         ret, std_opt, std_sol = simplex_algorithm(self.std_problem[0,:-1], self.std_problem[1:,:-1], self.std_problem[1:,-1])
+        logger.write("The problem is "+ret.name)
         
         if ret is SimplexSolution.FINITE:
             self.sol = np.array([sum([factor['coeff'] * std_sol[factor['var']] for factor in factors]) for factors in self.var_chg_map.values()])
             self.opt = std_opt if self.opt_type is DomainOptimizationType.MIN else -1 * std_opt
+            logger.write("The variables values are", self.sol, "with optimum value", self.opt)
+
         else :
             self.opt = np.inf if self.opt_type is DomainOptimizationType.MIN else np.NINF
         
@@ -48,10 +51,10 @@ class BBNode:
         if self.opt_type is DomainOptimizationType.MAX:
             return self.opt > other.opt      
         else :
-            return self.opt < other.opt       #TODO optimization type involved : to be changed
+            return self.opt < other.opt       
     
     def __repr__(self):
-        return str(self.opt)                    #TODO change in more informative and unique 
+        return str(self)                    
     
     def __str__(self):
         return 'P'+str(self.node_name)                                 
@@ -70,11 +73,14 @@ class BBTree:
         self.working_memory = deque([self.root])
 
     def solve(self) -> Tuple[SimplexSolution,BBNode] :
+        logger.write("Solving root node "+str(self.root))
         self.root.solve()
 
         while self.working_memory:
-            node = self.select_next()
 
+            logger.write("\nCurrent nodes stack: ",repr(self.working_memory))
+
+            node = self.select_next()
             logger.write("Considering node "+str(node))
             
             if node.ret_type is SimplexSolution.UNLIMITED:
@@ -109,13 +115,15 @@ class BBTree:
         variables = [d['var'] for d in self.var_chg_map[idx]]
         coefficients = [d['coeff'] for d in self.var_chg_map[idx]]
 
-        logger.write(str(idx) + " variable chosen for branching")
-        logger.write("Adding x"+str(idx)+" <= "+str(math.floor(val))+"and "+str(idx)+" >= "+str(math.ceil(val))+" constraints")
+        logger.write("Branch on variable X"+str(idx))
+        logger.write("Adding new costraints : X"+str(idx)+" <= "+str(math.floor(val))+" for left node and X"+str(idx)+" >= "+str(math.ceil(val))+" for right node\n")
         node.child_left = BBNode(node.std_problem, variables, coefficients, math.floor(val), 1, self.var_chg_map,self.incr_generated_nodes(),self.optimization_type)
         node.child_right = BBNode(node.std_problem, variables, coefficients, math.ceil(val), -1, self.var_chg_map,self.incr_generated_nodes(),self.optimization_type)
         
         #solve it already 
+        logger.write("Solving left node "+str(node.child_left))
         node.child_left.solve()
+        logger.write("Solving right node "+str(node.child_right))
         node.child_right.solve()
 
         self.add_childs_to_memory(node.child_left, node.child_right)
@@ -141,13 +149,11 @@ class BBTree:
 
 
 def bb_algorithm(std_problem, var_chg_map, optimization_type):
-    logger.write("\nStarting Branch and Bound algorithm")
+    logger.write("\nStarting Branch and Bound algorithm\n")
     tree = BBTree(std_problem, var_chg_map, optimization_type)
     ret, best_node = tree.solve()
 
     if ret is SimplexSolution.FINITE:
-        logger.write("Optimal integer solution found: ", best_node.sol)
         return ret, best_node.opt, best_node.sol
     else: 
-        logger.write("The problem is unlimited" if ret is SimplexSolution.UNLIMITED else "The problem is unsatisfiable")
         return ret, None, None

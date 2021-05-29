@@ -161,10 +161,7 @@ def define_artificial_problem(p):
     return obj_func,coeff_matrix,constant_terms,artificial_variables
 
 def simplex_algorithm(c, A, b):  
-    logger.write("\nStarting simplex")                                                                                  #TODO: SimplexProblem as argument?
-    logger.write("Costs:", c)
-    logger.write("Constraints:", A)
-    logger.write("Constant terms", b)
+    logger.write("\nStarting simplex")                                                                            
     #create object 
     problem = SimplexProblem(c, A, b)
 
@@ -174,25 +171,23 @@ def simplex_algorithm(c, A, b):
     
     #if cannot find starting basis phase1 is needed 
     if problem.check_basis():
-        logger.write("Starting basis not found")
+        logger.write("Unable to find an Initial Starting Basis, proceeding with Phase1")
         ret_type = phase1(problem)
         logger.write("End of Phase 1")                  
         
         if ret_type is SimplexSolution.IMPOSSIBLE:
-            logger.write("The problem is impossible")
             return ret_type, None, None
     else:
-        logger.write("Starting basis found, skipping to Phase 2")   
+        logger.write("Starting basis found, switching to Phase 2")   
     
     ret_type = phase2(problem)
 
     if ret_type is SimplexSolution.FINITE:
         solution = np.zeros(problem.c.size)
         solution[problem.in_basis] = problem.get_xb()
-        logger.write("The solution of the standard problem is", solution)
-        return ret_type, round(-problem.get_z()[0], SimplexProblem.DECIMAL_PRECISION), np.around(solution, SimplexProblem.DECIMAL_PRECISION)    # TODO: Check if has sense
+        opt = round(-problem.get_z()[0], SimplexProblem.DECIMAL_PRECISION)
+        return ret_type, opt, np.around(solution, SimplexProblem.DECIMAL_PRECISION)    # TODO: Check if makes sense
     else:
-        logger.write("Solution is not finite")
         return ret_type, None, None
 
 def from_p1_to_p2(p1 : SimplexArtificialProblem,p : SimplexProblem,lin_dep_rows):
@@ -213,7 +208,7 @@ def phase1(p : SimplexProblem):
     logger.write("\nStarting Phase 1")
     #determine changes to make for artificial problem
     c,A,b,art_vars = define_artificial_problem(p)
-    logger.write("Inserting ", ", ".join(["x"+str(i) for i in art_vars]), "as artificial variables")
+    logger.write("Inserting ",["x"+str(i) for i in art_vars]," as artificial variables")
 
     #create object 
     p1 = SimplexArtificialProblem(c,A,b,art_vars,p.in_basis.copy())
@@ -225,16 +220,16 @@ def phase1(p : SimplexProblem):
     p1.init_carry()
 
     while True :
-        logger.write("\nNew basis:\n", ", ".join(["x"+str(i) for i in p1.in_basis]))
-        logger.write("New carry matrix:\n", p1.carry_matrix)
-        #save out of basis vars
+        logger.write("\nNew basis: ",["x"+str(i) for i in p1.in_basis])
+
+        #save out_of_basis vars
         p1.compute_out_of_base()
 
         #compute reduced costs and determine entering var 
         cost,ent_var = p1.determine_entering_var()
         lin_dep_rows = None
         if cost == None:            #no negative cost found
-            if round(p1.get_z()[0], SimplexProblem.DECIMAL_PRECISION) != 0 :                                                                       #TODO: what if <0 ? 
+            if round(p1.get_z()[0], SimplexProblem.DECIMAL_PRECISION) != 0 :                                                  #TODO: what if <0 ? 
                 return SimplexSolution.IMPOSSIBLE
             elif p1.check_basis():   
                 lin_dep_rows = p1.substitute_artificial_vars()   
@@ -261,22 +256,19 @@ def phase2(p : SimplexProblem):
     p.init_carry()
 
     while True :
-        logger.write("\nNew basis:\n", ", ".join(["x"+str(i) for i in p.in_basis]))
-        logger.write("New carry matrix:\n", p.carry_matrix)
+        logger.write("\nNew basis: ",["x"+str(i) for i in p.in_basis])
 
-        #save out of basis vars
+        #save out_of_basis vars
         p.compute_out_of_base()
 
         #compute reduced costs and determine entering var 
         cost,ent_var = p.determine_entering_var()
         if cost == None: 
-            logger.write("\nOptimum found")
             return SimplexSolution.FINITE
             
         #determine exiting var 
         Aj,ext_var_index = p.determine_exiting_var(ent_var)
         if Aj is None:
-            logger.write("\nUnlimited problem")
             return SimplexSolution.UNLIMITED
 
         #ent_var entering basis , ext_var leaving
