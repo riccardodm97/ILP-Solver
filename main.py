@@ -1,3 +1,4 @@
+from lib.utils import DomainOptimizationType
 from lib.domain import DomainProblem
 from lib.simplex import simplex_algorithm
 
@@ -38,8 +39,18 @@ c3 = [-3, -5, 0, 0, 0]
 
 b3 = [25, 8, 10]
 
-# ret = simplex_algorithm(c3, A3, b3)
-# print(ret)
-
 dp = DomainProblem.from_abc(A3,b3,c3,non_negatives=[0,1,2,3,4],is_integer=True)
 dp.solve()
+
+
+# A4 = [
+#     [1, 1, 1, 0],
+#     [10, 6, 0, 1],
+# ]
+
+# c4 = [5, 17/4, 0, 0]
+
+# b4 = [5, 45]
+
+# dp = DomainProblem.from_abc(A4,b4,c4,type=DomainOptimizationType.MAX,non_negatives=[0,1,2,3],is_integer=True)
+# dp.solve()

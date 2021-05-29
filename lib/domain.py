@@ -58,14 +58,14 @@ class DomainProblem:
     def get_standard_form(self):
         logger.write("Turning the problem into standard form")
         Ac = np.r_[[self.costs], self.get_constraint_array()]
-        var_chg_map = {i: [{'var': i, 'coeff': 1}] for i in range(self.costs.size)}
+        var_chg_map = {i: [{'var': i, 'coeff': 1 if self.costs[i]!= 0 else 0 }] for i in range(self.costs.size)}          #TODO check
+        #var_chg_map = {i: [{'var': i, 'coeff': 1 }] for i in range(self.costs.size)}
         rows, cols = Ac.shape
 
         # 1. Change objective function to minimization
         if self.optimization_type == DomainOptimizationType.MAX:
             logger.write("Changing the objective function into a minimization function")
             Ac[0,:] *= -1
-
 
         # 2. Perform variable change over non-positive variables
         positive_variables = np.zeros(cols, dtype=bool)
