@@ -54,7 +54,7 @@ class BBNode:
             return self.opt < other.opt       
     
     def __repr__(self):
-        return str(self)                    
+        return str(self)+str(self.opt)                   
     
     def __str__(self):
         return 'P'+str(self.node_name)                                 
@@ -78,7 +78,7 @@ class BBTree:
 
         while self.working_memory:
 
-            logger.write("\nCurrent nodes stack: ",repr(self.working_memory))
+            logger.write("\nCurrent nodes stack: ",str(self.working_memory))
 
             node = self.select_next()
             logger.write("Considering node "+str(node))
