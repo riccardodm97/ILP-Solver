@@ -37,7 +37,7 @@ class BBNode:
         if ret is SimplexSolution.FINITE:
             self.sol = np.array([sum([factor['coeff'] * std_sol[factor['var']] for factor in factors]) for factors in self.var_chg_map.values()])
             self.opt = std_opt if self.opt_type is DomainOptimizationType.MIN else -1 * std_opt
-            logger.write("The variables values are", self.sol, "with optimum value", self.opt)
+            logger.write("The variables values are", self.sol, "with optimum value", self.opt,"\n")
 
         else :
             self.opt = np.inf if self.opt_type is DomainOptimizationType.MIN else np.NINF
@@ -54,7 +54,7 @@ class BBNode:
             return self.opt < other.opt       
     
     def __repr__(self):
-        return str(self)+"["+str(self.opt)+"]"                
+        return str(self)+"("+str(self.opt)+")"                
     
     def __str__(self):
         return 'P'+str(self.node_name)                                 
