@@ -38,4 +38,4 @@ def _print_to_target(*message: list):
     if _target is LogTarget.CONSOLE:
         print(message)
     elif _target is LogTarget.FILE:
-        _target_file.write(" ".join(str(x) for x in message))
+        _target_file.write(" ".join(str(x) for x in message) + "\n")
