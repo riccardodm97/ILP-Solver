@@ -54,7 +54,7 @@ class BBNode:
             return self.opt < other.opt       
     
     def __repr__(self):
-        return str(self)+str(self.opt)                   
+        return str(self)+"["+str(self.opt)+"]"                
     
     def __str__(self):
         return 'P'+str(self.node_name)                                 
