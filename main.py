@@ -52,8 +52,8 @@ c4 = [5, 17/4, 0, 0]
 
 b4 = [5, 45]
 
-# dp = DomainProblem.from_abc(A4,b4,c4,type=DomainOptimizationType.MAX,non_negatives=[0,1,2,3],is_integer=True)
-# dp.solve()
+dp = DomainProblem.from_abc(A4,b4,c4,type=DomainOptimizationType.MAX,non_negatives=[0,1,2,3],is_integer=True)
+dp.solve()
 
 
 A5 = [
@@ -66,5 +66,5 @@ c5 = [3, 5, 0, 0, 0]
 
 b5 = [25, 8, 10]
 
-dp = DomainProblem.from_abc(A5,b5,c5,type=DomainOptimizationType.MAX,non_negatives=[0,1,2,3,4],is_integer=True)
-dp.solve()
+# dp = DomainProblem.from_abc(A5,b5,c5,type=DomainOptimizationType.MAX,non_negatives=[0,1,2,3,4],is_integer=True)
+# dp.solve()
