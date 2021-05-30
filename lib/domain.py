@@ -56,16 +56,16 @@ class DomainProblem:
         return np.array([c.constant for c in self.constraints]) #TODO: Property?
 
     def get_standard_form(self):
-        logger.write("Turning the problem into standard form")
+        logger.write("\nTurning the problem into standard form")
         Ac = np.r_[[self.costs], self.get_constraint_array()]
-        var_chg_map = {i: [{'var': i, 'coeff': 1}] for i in range(self.costs.size)}
+        var_chg_map = {i: [{'var': i, 'coeff': 1 if self.costs[i]!= 0 else 0 }] for i in range(self.costs.size)}          #TODO check
+        #var_chg_map = {i: [{'var': i, 'coeff': 1 }] for i in range(self.costs.size)}
         rows, cols = Ac.shape
 
         # 1. Change objective function to minimization
-        if self.optimization_type == DomainOptimizationType.MAX:
+        if self.optimization_type is DomainOptimizationType.MAX:
             logger.write("Changing the objective function into a minimization function")
             Ac[0,:] *= -1
-
 
         # 2. Perform variable change over non-positive variables
         positive_variables = np.zeros(cols, dtype=bool)
@@ -108,23 +108,21 @@ class DomainProblem:
 
     def get_problem_sol(self, optimum, standard_sol, var_chg_map):
         sol = np.array([sum([factor['coeff'] * standard_sol[factor['var']] for factor in factors]) for factors in var_chg_map.values()])
-        return (optimum if self.optimization_type == DomainOptimizationType.MIN else -optimum), sol
+        return (optimum if self.optimization_type is DomainOptimizationType.MIN else -optimum), sol
 
     def solve(self):
         standard_matrix, var_chg_map = self.get_standard_form()
 
         if self.is_integer:
             ret, std_opt, std_sol = bb_algorithm(standard_matrix, var_chg_map, self.optimization_type)
+            opt, sol = std_opt, std_sol 
         else:
             ret, std_opt, std_sol = simplex_algorithm(standard_matrix[0,:-1], standard_matrix[1:,:-1], standard_matrix[1:,-1])
-
-        if ret is SimplexSolution.FINITE:
             opt, sol = self.get_problem_sol(std_opt, std_sol, var_chg_map)
-            logger.write("The solution of the original problem is", sol)
-            logger.write("The optimum value being", opt)
-            return ret, opt, sol
-        else:
-            return ret, None, None
+
+        logger.write("The problem is "+ret.name)
+        if ret is SimplexSolution.FINITE: 
+            logger.write("The variables values are", sol, "with optimum value", opt)
 
 class DomainConstraint:
 
