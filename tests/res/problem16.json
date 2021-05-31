@@ -1,0 +1,71 @@
+{
+    "objective": {
+        "costs": [9, 9, 9, 10, 10, 10, 12, 12, 12],
+        "optimization": "MAX"
+    },
+    "constraints": [
+        {
+            "coefficients": [1, 0, 0, 1, 0, 0, 1, 0, 0],
+            "constant": 500,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [0, 1, 0, 0, 1, 0, 0, 1, 0],
+            "constant": 600,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [0, 0, 1, 0, 0, 1, 0, 0, 1],
+            "constant": 300,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [2, 0, 0, 1.5, 0, 0, 1, 0, 0],
+            "constant": 900,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [0, 2, 0, 0, 1.5, 0, 0, 1, 0],
+            "constant": 800,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [0, 0, 2, 0, 0, 1.5, 0, 0, 1],
+            "constant": 350,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [1, 1, 1, 0, 0, 0, 0, 0, 0],
+            "constant": 600,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [0, 0, 0, 1, 1, 1, 0, 0, 0],
+            "constant": 800,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [0, 0, 0, 0, 0, 0, 1, 1, 1],
+            "constant": 500,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [0.002, -0.001666666666666666, 0, 0.002, -0.001666666666666666, 0, 0.002, -0.001666666666666666, 0],
+            "constant": 0,
+            "type": "EQ"
+        },
+        {
+            "coefficients": [0.002, 0, -0.003333333333333333, 0.002, 0, -0.003333333333333333, 0.002, 0, -0.003333333333333333],
+            "constant": 0,
+            "type": "EQ"
+        }
+    ],
+    "non-negatives": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+    "non-positives": [],
+    "integer": true,
+    "solution": {
+        "values": [402, 89, 0, 107, 233, 363, 96, 404, 0],
+        "optimum": 16949,
+        "type": 1
+    }
+}
