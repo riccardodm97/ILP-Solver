@@ -9,22 +9,25 @@ import json
 
 class DomainProblem:
 
-    def __init__(self, costs, optimization_type, constraints, non_negatives=[], non_positives=[], is_integer=False):
+    def __init__(self, costs, optimization_type, constraints, non_negatives=None, non_positives=[], is_integer=False):
+        if non_negatives is None:
+            non_negatives = np.arange(costs.size)
+
         self.costs = costs
         self.constraints = constraints
-        self.non_negatives = non_negatives
         self.non_positives = non_positives
         self.optimization_type = optimization_type
         self.is_integer = is_integer
+        self.non_negatives = non_negatives
 
     @staticmethod
-    def from_matrix(matrix, type=DomainOptimizationType.MIN, non_negatives=[], non_positives=[], is_integer=False):
+    def from_matrix(matrix, type=DomainOptimizationType.MIN, non_negatives=None, non_positives=[], is_integer=False):
         A, b, c = matrix[1:,:-1], matrix[:,-1], matrix[0,:]
 
         return DomainProblem.from_abc(A, b, c, type, non_negatives, non_positives, is_integer)
 
     @staticmethod
-    def from_abc(A, b, c, type=DomainOptimizationType.MIN, non_negatives=[], non_positives=[], is_integer=False):
+    def from_abc(A, b, c, type=DomainOptimizationType.MIN, non_negatives=None, non_positives=[], is_integer=False):
         constraints = []
         for coefficients, constant in zip(A, b):
             constraints.append(DomainConstraint(coefficients, constant, DomainConstraintType.EQUAL))
