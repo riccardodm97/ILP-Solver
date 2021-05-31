@@ -1,89 +1,75 @@
-from lib.utils import DomainOptimizationType
-from lib.domain import DomainProblem
-from lib.simplex import simplex_algorithm
+import json
+from lib import logger
+from lib.logger import LogTarget, LogVerbosity
 
-int_probl = DomainProblem.from_json("tests/res/problem16.json")
-int_probl.solve()
+import numpy as np
+from lib.utils import DomainConstraintType, DomainOptimizationType, plot_map
+from lib.domain import DomainConstraint, DomainProblem
+from argparse import ArgumentParser
+import time
 
-A1 = [
-    [1,  1,  1, -1,  0,  0],
-    [2,  0, -1,  1,  1,  0],
-    [3,  0,  1,  2,  0,  1]
-]
+image_path = "res/rome2.png"
+blocks_data_path = "res/rome2.json"
+columns_data_path = "res/columns.json"
 
-c1 = [2, -3, 1, -4, 1, 0]
+def run_example(blocks_filename, columns_filename, image_filename=None, plot=False, log_target=LogTarget.NONE, log_verbose=LogVerbosity.LOW):
+    logger.set_target(log_target)
+    logger.set_verbosity(log_verbose)
 
-b1 = [4,2,1]
+    with open(blocks_filename) as json_blocks, open(columns_filename) as json_columns:
+        blocks = json.load(json_blocks)
+        columns = json.load(json_columns)
 
-# ret = simplex_algorithm(c1, A1, b1)
-# print(ret)
+    blocks_num = len(blocks)
+    cols_num = len(columns)
+    var_number = blocks_num * cols_num
+    c = np.array([columns[i % 3]['power'] for i in range(var_number)])
 
+    constraints = []
 
-A2 = [
-    [1, -1, 3, 2],
-    [2, 1, -3, 3],
-    [3, 0, 0, 5]
-]
+    # area
+    for index, block in enumerate(blocks):
+        constraints.append(DomainConstraint([columns[i % cols_num]['area'] if index * cols_num <= i < (index + 1) * cols_num else 0 for i in range(var_number)], block['area'], DomainConstraintType.LESS_EQUAL))
 
-c2 = [-1, 1, -2, 3]
+    # minim 
+    for index, block in enumerate(blocks):
+        constraints.append(DomainConstraint([1 if index * cols_num <= i < (index + 1) * cols_num else 0 for i in range(var_number)], block['min_number'], DomainConstraintType.LESS_EQUAL))
 
-b2 = [4,6,10]
+    # price 
+    constraints.append(DomainConstraint([columns[i % cols_num]['cost'] for i in range(var_number)], 600, DomainConstraintType.LESS_EQUAL))
 
-# ret = simplex_algorithm(c2, A2, b2)
-# print(ret)
+    # availability 
+    for index, column in enumerate(columns):
+        constraints.append(DomainConstraint([1 if index % cols_num == 0 else 0 for i in range(var_number)], column['availability'], DomainConstraintType.LESS_EQUAL))
 
-A3 = [
-    [2, 4, 1, 0, 0],
-    [1, 0, 0, 1, 0],
-    [0, 2, 0, 0, 1]
-]
+    int_probl = DomainProblem(c, DomainOptimizationType.MAX, constraints, is_integer=True)
+    ret, opt, sol = int_probl.solve()
 
-c3 = [-3, -5, 0, 0, 0]
+    if plot:
+        plot_map(image_filename, blocks, columns, sol)
 
-b3 = [25, 8, 10]
+if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser.add_argument("-B", "--blocks", dest="blocks", help="TODO", default="res/rome.json")
+    parser.add_argument("-C", "--columns", dest="columns", help="TODO", default="res/columns.json")
+    parser.add_argument("-I", "--image", dest="image", help="TODO", default=None)
+    parser.add_argument("-L", "--logging", dest="logging", help="TODO", default="none", choices=['none', 'console', 'file'])
+    parser.add_argument('-V', '--verbosity', dest="verbosity", help="TODO", default="low", choices=['low', 'high'])
+    parser.add_argument('-P', '--plot', dest="plot", help="TODO", default=False, action='store_true')
+    args = parser.parse_args()
 
-# dp = DomainProblem.from_abc(A3,b3,c3,non_negatives=[0,1,2,3,4],is_integer=True)
-# dp.solve()
+    start_time = time.time()
+    run_example(args.blocks, args.columns, args.image, 
+        plot=args.plot, 
+        log_target={
+            "none": LogTarget.NONE,
+            "console": LogTarget.CONSOLE,
+            "file": LogTarget.FILE,
+        }[args.logging], 
+        log_verbose={
+            "low": LogVerbosity.LOW,
+            "high": LogVerbosity.HIGH,
+        }[args.verbosity])
+    end_time = time.time()
 
-
-A4 = [
-    [1, 1, 1, 0],
-    [10, 6, 0, 1],
-]
-
-c4 = [5, 17/4, 0, 0]
-
-b4 = [5, 45]
-
-# dp = DomainProblem.from_abc(A4,b4,c4,type=DomainOptimizationType.MAX,non_negatives=[0,1,2,3],is_integer=True)
-# dp.solve()
-
-
-A5 = [
-    [2, 4, 1, 0, 0],
-    [1, 0, 0, 1, 0],
-    [0, 2, 0, 0, 1],
-]
-
-c5 = [3, 5, 0, 0, 0]
-
-b5 = [25, 8, 10]
-
-# dp = DomainProblem.from_abc(A5,b5,c5,type=DomainOptimizationType.MAX,non_negatives=[0,1,2,3,4],is_integer=True)
-# dp.solve()
-
-
-A6 = [
-    [-1, 1, 1, 0, 0],
-    [3, 2, 0, 1, 0],
-    [2, 3, 0, 0, 1],
-]
-
-c6 = [0, 1, 0, 0, 0]
-
-b6 = [1, 12, 12]
-
-# dp = DomainProblem.from_abc(A6,b6,c6,type=DomainOptimizationType.MAX,non_negatives=[0,1,2,3,4],is_integer=True)
-# dp.solve()
-
-# DomainProblem.from_json('problem16.json').solve()
+    print("Execution finished in " + str(end_time - start_time) + "ms")
