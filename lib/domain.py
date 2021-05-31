@@ -7,7 +7,7 @@ import numpy as np
 from enum import Enum
 import json
 
-class DomainProblem:
+class DomainProblem: #TODO Better inline creation
 
     def __init__(self, costs, optimization_type, constraints, non_negatives=None, non_positives=[], is_integer=False):
         if non_negatives is None:
