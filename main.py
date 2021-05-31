@@ -13,6 +13,7 @@ blocks_data_path = "res/rome2.json"
 columns_data_path = "res/columns.json"
 
 def run_example(blocks_filename, columns_filename, image_filename=None, plot=False, log_target=LogTarget.NONE, log_verbose=LogVerbosity.LOW):
+    start_time = time.time()
     logger.set_target(log_target)
     logger.set_verbosity(log_verbose)
 
@@ -44,9 +45,12 @@ def run_example(blocks_filename, columns_filename, image_filename=None, plot=Fal
 
     int_probl = DomainProblem(c, DomainOptimizationType.MAX, constraints, is_integer=True)
     ret, opt, sol = int_probl.solve()
+    end_time = time.time()
 
     if plot:
         plot_map(image_filename, blocks, columns, sol)
+
+    return end_time - start_time
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -58,8 +62,7 @@ if __name__ == "__main__":
     parser.add_argument('-P', '--plot', dest="plot", help="TODO", default=False, action='store_true')
     args = parser.parse_args()
 
-    start_time = time.time()
-    run_example(args.blocks, args.columns, args.image, 
+    execution_time = run_example(args.blocks, args.columns, args.image, 
         plot=args.plot, 
         log_target={
             "none": LogTarget.NONE,
@@ -70,6 +73,5 @@ if __name__ == "__main__":
             "low": LogVerbosity.LOW,
             "high": LogVerbosity.HIGH,
         }[args.verbosity])
-    end_time = time.time()
 
-    print("Execution finished in " + str(end_time - start_time) + "ms")
+    print("Execution finished in " + str(execution_time) + "s")
