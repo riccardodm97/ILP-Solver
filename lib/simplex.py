@@ -1,11 +1,10 @@
 from enum import Enum
-from lib.utils import SimplexSolution
+from lib.utils import Parameters, SimplexSolution
 from lib import logger 
 import numpy as np
 
 class SimplexProblem:
-
-    DECIMAL_PRECISION = 13
+    
     #TODO: Add maximum iteration limit?
 
     def __init__(self, obj_func_coefficent, coefficent_matrix, constant_terms):
@@ -124,7 +123,7 @@ class SimplexArtificialProblem(SimplexProblem):
             ent_var = None 
             for var in self.out_basis[~np.isin(self.out_basis,self.artificial_vars)]:
                 Aj = self.get_Aj(var)
-                if round(Aj[idx], SimplexProblem.DECIMAL_PRECISION) != 0:
+                if round(Aj[idx], Parameters.DECIMAL_PRECISION) != 0:
                     # var entering
                     self.in_basis[idx] = var
                     self.update_carry(idx,Aj)
@@ -185,8 +184,8 @@ def simplex_algorithm(c, A, b):
     if ret_type is SimplexSolution.FINITE:
         solution = np.zeros(problem.c.size)
         solution[problem.in_basis] = problem.get_xb()
-        opt = round(-problem.get_z()[0], SimplexProblem.DECIMAL_PRECISION)
-        return ret_type, opt, np.around(solution, SimplexProblem.DECIMAL_PRECISION)    # TODO: Check if makes sense
+        opt = round(-problem.get_z()[0], Parameters.DECIMAL_PRECISION)
+        return ret_type, opt, np.around(solution, Parameters.DECIMAL_PRECISION)    # TODO: Check if makes sense
     else:
         return ret_type, None, None
 
@@ -229,7 +228,7 @@ def phase1(p : SimplexProblem):
         cost,ent_var = p1.determine_entering_var()
         lin_dep_rows = None
         if cost == None:            #no negative cost found
-            if round(p1.get_z()[0], SimplexProblem.DECIMAL_PRECISION) != 0 :                                                  #TODO: what if <0 ? 
+            if round(p1.get_z()[0], Parameters.DECIMAL_PRECISION) != 0 :                                                  #TODO: what if <0 ? 
                 return SimplexSolution.IMPOSSIBLE
             elif p1.check_basis():   
                 lin_dep_rows = p1.substitute_artificial_vars()   

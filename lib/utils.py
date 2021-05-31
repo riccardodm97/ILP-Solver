@@ -1,5 +1,8 @@
 from enum import Enum
 
+class Parameters:
+    DECIMAL_PRECISION = 13
+
 class SimplexSolution(Enum):
     FINITE = 1
     UNLIMITED = 2

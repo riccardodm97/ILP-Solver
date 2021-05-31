@@ -4,7 +4,7 @@ from collections import deque
 import numpy as np
 from typing import Tuple
 
-from lib.utils import SimplexSolution, DomainOptimizationType
+from lib.utils import Parameters, SimplexSolution, DomainOptimizationType
 from lib.simplex import simplex_algorithm
 
 from sortedcontainers import SortedList
@@ -45,7 +45,7 @@ class BBNode:
         self.ret_type = ret
 
     def is_int(self):
-        return np.all(np.mod(self.sol, 1) == 0)
+        return np.all(np.mod(np.around(self.sol, Parameters.DECIMAL_PRECISION), 1) == 0)
     
     def __lt__(self, other):
         if self.opt_type is DomainOptimizationType.MAX:

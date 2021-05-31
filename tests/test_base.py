@@ -1,4 +1,5 @@
 
+from lib.utils import Parameters
 from lib.domain import DomainProblem
 import numpy as np
 from lib.simplex import SimplexProblem
@@ -19,7 +20,7 @@ class TestBase(unittest.TestCase):
             else:
                 val = fract
 
-            val = np.around(val, SimplexProblem.DECIMAL_PRECISION)
+            val = np.around(val, Parameters.DECIMAL_PRECISION)
         else:
             if type(fract) == str:
                 val = Fraction(fract)
@@ -27,7 +28,7 @@ class TestBase(unittest.TestCase):
             else:
                 val = fract
 
-            val = round(val, SimplexProblem.DECIMAL_PRECISION)
+            val = round(val, Parameters.DECIMAL_PRECISION)
         return val
 
     def _get_base_dir(self):
