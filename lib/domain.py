@@ -1,3 +1,4 @@
+from fractions import Fraction
 from lib import logger
 from lib.bb import bb_algorithm
 from lib.simplex import SimplexProblem, phase1, phase2, simplex_algorithm
@@ -128,7 +129,16 @@ class DomainProblem:
 
 class DomainConstraint:
 
-    def __init__(self, coefficients, constant, type):
-        self.coefficients = coefficients
+    def __init__(self, coefficients, constant, const_type):
+        self.coefficients = []
+        for c in coefficients:
+            if type(c) == str:
+                val = Fraction(c)
+                val = val.numerator / val.denominator
+            else:
+                val = c
+            self.coefficients.append(val)
+            
+        self.coefficients = np.array(self.coefficients)
         self.constant = constant
-        self.type = type
+        self.type = const_type
