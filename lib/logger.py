@@ -9,6 +9,7 @@ class LogVerbosity(Enum):
 class LogTarget(Enum):
     FILE = 1
     CONSOLE = 2
+    NONE = 3
 
 _verbosity = LogVerbosity.HIGH
 _target = LogTarget.FILE
