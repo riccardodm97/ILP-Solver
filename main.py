@@ -2,6 +2,9 @@ from lib.utils import DomainOptimizationType
 from lib.domain import DomainProblem
 from lib.simplex import simplex_algorithm
 
+int_probl = DomainProblem.from_json("tests/res/problem16.json")
+int_probl.solve()
+
 A1 = [
     [1,  1,  1, -1,  0,  0],
     [2,  0, -1,  1,  1,  0],
@@ -52,8 +55,8 @@ c4 = [5, 17/4, 0, 0]
 
 b4 = [5, 45]
 
-dp = DomainProblem.from_abc(A4,b4,c4,type=DomainOptimizationType.MAX,non_negatives=[0,1,2,3],is_integer=True)
-dp.solve()
+# dp = DomainProblem.from_abc(A4,b4,c4,type=DomainOptimizationType.MAX,non_negatives=[0,1,2,3],is_integer=True)
+# dp.solve()
 
 
 A5 = [
