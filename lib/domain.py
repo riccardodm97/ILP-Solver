@@ -118,15 +118,13 @@ class DomainProblem:
             opt, sol = std_opt, std_sol 
         else:
             ret, std_opt, std_sol = simplex_algorithm(standard_matrix[0,:-1], standard_matrix[1:,:-1], standard_matrix[1:,-1])
-            if ret is SimplexSolution.FINITE: 
-                opt, sol = self.get_problem_sol(std_opt, std_sol, var_chg_map)
+            opt, sol = self.get_problem_sol(std_opt, std_sol, var_chg_map) if ret is SimplexSolution.FINITE else (None, None)
 
         logger.write("The problem is "+ret.name)
         if ret is SimplexSolution.FINITE: 
             logger.write("The variables values are", sol, "with optimum value", opt)
-            return ret, opt, sol
-        else:
-            return ret, None, None
+        
+        return ret, opt, sol 
 
 class DomainConstraint:
 
