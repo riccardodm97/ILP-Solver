@@ -92,4 +92,4 @@ class TestBase(unittest.TestCase):
         return problems[problem_type]
 
     def _get_problem_files(self):
-        return [self._get_base_dir()+'/res/problem'+str(i)+'.json' for i in range(1, 16)]
+        return [self._get_base_dir()+'/res/problem'+str(i)+'.json' for i in range(1, 17)]
