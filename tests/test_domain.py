@@ -29,13 +29,12 @@ class TestDomainProblem(TestBase):
 
     def test_get_standard_form(self):
         for p, solution in self._load_problems('decimal'):
-            if 'standard' in solution:
-                std_problem, chg = p.get_standard_form()
-                std_real = np.array(solution['standard']['form'])
-                self.assertEqual(std_problem.shape, std_real.shape)
+            std_problem, chg = p.get_standard_form()
+            std_real = np.array(solution['standard']['form'])
+            self.assertEqual(std_problem.shape, std_real.shape)
 
-                if std_problem.shape == std_real.shape:
-                    self.assertTrue((std_problem == std_real).all())
+            if std_problem.shape == std_real.shape:
+                self.assertTrue((std_problem == std_real).all())
     
     def test_get_problem_sol(self):
         #(self, optimum, standard_sol, var_chg_map):
@@ -45,11 +44,10 @@ class TestDomainProblem(TestBase):
 
             self.assertEqual(ret_type.value, solution['type'])
 
-            if 'type' in solution:
-                if ret_type is SimplexSolution.FINITE:
-                    opt, sol = p.get_problem_sol(std_opt, std_sol, chg)
-                    self.assertEqual(opt, self._fract_to_dec(solution['optimum']))
-                    self.assertTrue((sol == self._fract_to_dec(np.array(solution['values']))).all())
+            if ret_type is SimplexSolution.FINITE:
+                opt, sol = p.get_problem_sol(std_opt, std_sol, chg)
+                self.assertEqual(opt, self._fract_to_dec(solution['optimum']))
+                self.assertTrue((sol == self._fract_to_dec(np.array(solution['values']))).all())
 
     def test_solve(self):
         pass #TODO
