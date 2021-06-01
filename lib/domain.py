@@ -20,6 +20,9 @@ class DomainProblem: #TODO Better inline creation
         self.is_integer = is_integer
         self.non_negatives = non_negatives
 
+        self._constraint_array = None
+        self._constants_array = None
+
     @staticmethod
     def from_matrix(matrix, type=DomainOptimizationType.MIN, non_negatives=None, non_positives=[], is_integer=False):
         A, b, c = matrix[1:,:-1], matrix[:,-1], matrix[0,:]
@@ -54,10 +57,14 @@ class DomainProblem: #TODO Better inline creation
         }[problem['objective']['optimization']], constraints, problem['non-negatives'], problem.get('non-positives', []), problem.get('integer', False))
 
     def get_constraint_array(self):
-        return np.array([c.coefficients for c in self.constraints]) #TODO: Property?
+        if self._constraint_array is None:
+            self._constraint_array = np.array([c.coefficients for c in self.constraints])
+        return self._constraint_array
 
     def get_constants_array(self):
-        return np.array([c.constant for c in self.constraints]) #TODO: Property?
+        if self._constants_array is None:
+            self._constants_array = np.array([c.constant for c in self.constraints])
+        return self._constants_array
 
     def get_standard_form(self):
         logger.write("\nTurning the problem into standard form")
