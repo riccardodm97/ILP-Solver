@@ -5,7 +5,7 @@ from matplotlib.patches import Rectangle
 class Parameters:
     DECIMAL_PRECISION = 13
 
-class SimplexSolution(Enum):
+class ProblemSolution(Enum):
     FINITE = 1
     UNLIMITED = 2
     IMPOSSIBLE = 3

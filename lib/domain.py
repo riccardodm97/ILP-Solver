@@ -2,7 +2,7 @@ from fractions import Fraction
 from lib import logger
 from lib.bb import bb_algorithm
 from lib.simplex import SimplexProblem, phase1, phase2, simplex_algorithm
-from lib.utils import DomainConstraintType, DomainOptimizationType, SimplexSolution
+from lib.utils import DomainConstraintType, DomainOptimizationType, ProblemSolution
 import numpy as np
 from enum import Enum
 import json
@@ -122,10 +122,10 @@ class DomainProblem: #TODO Better inline creation
             opt, sol = std_opt, std_sol 
         else:
             ret, std_opt, std_sol = simplex_algorithm(standard_matrix[0,:-1], standard_matrix[1:,:-1], standard_matrix[1:,-1])
-            opt, sol = self.get_problem_sol(std_opt, std_sol, var_chg_map) if ret is SimplexSolution.FINITE else (None, None)
+            opt, sol = self.get_problem_sol(std_opt, std_sol, var_chg_map) if ret is ProblemSolution.FINITE else (None, None)
 
         logger.write("The problem is "+ret.name)
-        if ret is SimplexSolution.FINITE: 
+        if ret is ProblemSolution.FINITE: 
             logger.write("The variables values are", sol, "with optimum value", opt)
         
         return ret, opt, sol 

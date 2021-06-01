@@ -1,5 +1,5 @@
 from enum import Enum
-from lib.utils import Parameters, SimplexSolution
+from lib.utils import Parameters, ProblemSolution
 from lib import logger 
 import numpy as np
 
@@ -174,14 +174,14 @@ def simplex_algorithm(c, A, b):
         ret_type = phase1(problem)
         logger.write("End of Phase 1")                  
         
-        if ret_type is SimplexSolution.IMPOSSIBLE:
+        if ret_type is ProblemSolution.IMPOSSIBLE:
             return ret_type, None, None
     else:
         logger.write("Starting basis found, switching to Phase 2")   
     
     ret_type = phase2(problem)
 
-    if ret_type is SimplexSolution.FINITE:
+    if ret_type is ProblemSolution.FINITE:
         solution = np.zeros(problem.c.size)
         solution[problem.in_basis] = problem.get_xb()
         opt = round(-problem.get_z()[0], Parameters.DECIMAL_PRECISION)
@@ -229,12 +229,12 @@ def phase1(p : SimplexProblem):
         lin_dep_rows = None
         if cost == None:            #no negative cost found
             if round(p1.get_z()[0], Parameters.DECIMAL_PRECISION) != 0 :                                                  #TODO: what if <0 ? 
-                return SimplexSolution.IMPOSSIBLE
+                return ProblemSolution.IMPOSSIBLE
             elif p1.check_basis():   
                 lin_dep_rows = p1.substitute_artificial_vars()   
 
             from_p1_to_p2(p1,p,lin_dep_rows)
-            return SimplexSolution.FINITE
+            return ProblemSolution.FINITE
 
         #determine exiting var 
         Aj,ext_var_index = p1.determine_exiting_var(ent_var)
@@ -263,12 +263,12 @@ def phase2(p : SimplexProblem):
         #compute reduced costs and determine entering var 
         cost,ent_var = p.determine_entering_var()
         if cost == None: 
-            return SimplexSolution.FINITE
+            return ProblemSolution.FINITE
             
         #determine exiting var 
         Aj,ext_var_index = p.determine_exiting_var(ent_var)
         if Aj is None:
-            return SimplexSolution.UNLIMITED
+            return ProblemSolution.UNLIMITED
 
         #ent_var entering basis , ext_var leaving
         p.swap_vars(ext_var_index,ent_var)        

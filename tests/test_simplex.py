@@ -142,7 +142,7 @@ class TestBaseFunctions(TestBase):
 
             self.assertEqual(ret.value, solution['type'])
 
-            if ret is SimplexSolution.FINITE:
+            if ret is ProblemSolution.FINITE:
                 arr = self._fract_to_dec(np.array(solution['values']))
 
                 self.assertEqual(sol.shape, arr.shape)

@@ -1,4 +1,4 @@
-from lib.utils import SimplexSolution
+from lib.utils import ProblemSolution
 from lib.bb import bb_algorithm
 from tests.test_base import TestBase
 import numpy as np
@@ -14,7 +14,7 @@ class TestBranchAndBound(TestBase):
 
             self.assertEqual(ret_type.value, solution['type'])
 
-            if ret_type is SimplexSolution.FINITE:
+            if ret_type is ProblemSolution.FINITE:
                 opt, sol = p.get_problem_sol(std_opt, std_sol, chg)
                 self.assertEqual(opt, self._fract_to_dec(solution['optimum']))
                 self.assertTrue((sol == self._fract_to_dec(np.array(solution['values']))).all())

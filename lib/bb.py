@@ -4,7 +4,7 @@ from collections import deque
 import numpy as np
 from typing import Tuple
 
-from lib.utils import Parameters, SimplexSolution, DomainOptimizationType
+from lib.utils import Parameters, ProblemSolution, DomainOptimizationType
 from lib.simplex import simplex_algorithm
 
 from sortedcontainers import SortedList
@@ -34,7 +34,7 @@ class BBNode:
         ret, std_opt, std_sol = simplex_algorithm(self.std_problem[0,:-1], self.std_problem[1:,:-1], self.std_problem[1:,-1])
         logger.write("The problem is "+ret.name)
         
-        if ret is SimplexSolution.FINITE:
+        if ret is ProblemSolution.FINITE:
             self.sol = np.array([sum([factor['coeff'] * std_sol[factor['var']] for factor in factors]) for factors in self.var_chg_map.values()])
             self.opt = std_opt if self.opt_type is DomainOptimizationType.MIN else -1 * std_opt
             logger.write("The variables values are", self.sol, "with optimum value", self.opt,"\n")
@@ -72,7 +72,7 @@ class BBTree:
 
         self.working_memory = deque([self.root])
 
-    def solve(self) -> Tuple[SimplexSolution,BBNode] :
+    def solve(self) -> Tuple[ProblemSolution,BBNode] :
         logger.write("Solving root node "+str(self.root))
         self.root.solve()
 
@@ -83,10 +83,10 @@ class BBTree:
             node = self.select_next()
             logger.write("Considering node "+str(node))
             
-            if node.ret_type is SimplexSolution.UNLIMITED:
+            if node.ret_type is ProblemSolution.UNLIMITED:
                 return node.ret_type, None
 
-            if node.ret_type is SimplexSolution.IMPOSSIBLE:
+            if node.ret_type is ProblemSolution.IMPOSSIBLE:
                 logger.write("The problem associated with node "+str(node)+" is impossible - Pruning by infeasibility")
             elif self.is_worse(node): 
                 logger.write("The solution associated with node "+str(node)+" is worse than the current best one - Pruning by bound")
@@ -101,7 +101,7 @@ class BBTree:
                     logger.write("The solution associated with node "+str(node)+" is not integer - Branching the tree")
                     self.branch(node) # Branch
 
-        return SimplexSolution.FINITE if self.best_node is not None else SimplexSolution.IMPOSSIBLE, self.best_node
+        return ProblemSolution.FINITE if self.best_node is not None else ProblemSolution.IMPOSSIBLE, self.best_node
 
     def is_worse(self, node : BBNode) -> bool:
         if self.best_node is None:
@@ -153,7 +153,7 @@ def bb_algorithm(std_problem, var_chg_map, optimization_type):
     tree = BBTree(std_problem, var_chg_map, optimization_type)
     ret, best_node = tree.solve()
 
-    if ret is SimplexSolution.FINITE:
+    if ret is ProblemSolution.FINITE:
         return ret, best_node.opt, best_node.sol
     else: 
         return ret, None, None
