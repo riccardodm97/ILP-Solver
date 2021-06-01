@@ -37,7 +37,8 @@ def run_example(blocks_filename, columns_filename, image_filename=None, plot=Fal
         int_probl.add_constraint(DomainConstraint([1 if index * cols_num <= i < (index + 1) * cols_num else 0 for i in range(var_number)], block['min_number'], DomainConstraintType.GREAT_EQUAL))
 
     # price 
-    int_probl.add_constraint(DomainConstraint([columns[i % cols_num]['cost'] for i in range(var_number)], 2000, DomainConstraintType.LESS_EQUAL))
+    budget = 62000
+    int_probl.add_constraint(DomainConstraint([columns[i % cols_num]['cost'] for i in range(var_number)], budget, DomainConstraintType.LESS_EQUAL))
 
     # availability 
     for index, column in enumerate(columns):
@@ -55,12 +56,12 @@ def run_example(blocks_filename, columns_filename, image_filename=None, plot=Fal
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("-B", "--blocks", dest="blocks", help="TODO", default="res/rome.json")
-    parser.add_argument("-C", "--columns", dest="columns", help="TODO", default="res/columns.json")
-    parser.add_argument("-I", "--image", dest="image", help="TODO", default=None)
-    parser.add_argument("-L", "--logging", dest="logging", help="TODO", default="none", choices=['none', 'console', 'file'])
-    parser.add_argument('-V', '--verbosity', dest="verbosity", help="TODO", default="low", choices=['low', 'high'])
-    parser.add_argument('-P', '--plot', dest="plot", help="TODO", default=False, action='store_true')
+    parser.add_argument("-B", "--blocks", dest="blocks", help="Path of the blocks definition file", default="res/rome.json")
+    parser.add_argument("-C", "--columns", dest="columns", help="Path of the columns definition file", default="res/columns.json")
+    parser.add_argument("-I", "--image", dest="image", help="Path of the blocks map image", default=None)
+    parser.add_argument("-L", "--logging", dest="logging", help="Defines logging mode", default="none", choices=['none', 'console', 'file'])
+    parser.add_argument('-V', '--verbosity', dest="verbosity", help="Defines verbosity level", default="low", choices=['low', 'high'])
+    parser.add_argument('-P', '--plot', dest="plot", help="If specified plots the resulting image at the end of execution", default=False, action='store_true')
     args = parser.parse_args()
 
     execution_time = run_example(args.blocks, args.columns, args.image, 
