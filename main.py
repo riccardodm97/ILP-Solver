@@ -26,24 +26,23 @@ def run_example(blocks_filename, columns_filename, image_filename=None, plot=Fal
     var_number = blocks_num * cols_num
     c = np.array([columns[i % 3]['power'] for i in range(var_number)])
 
-    constraints = []
+    int_probl = DomainProblem(c, DomainOptimizationType.MAX, is_integer=True)
 
     # area
     for index, block in enumerate(blocks):
-        constraints.append(DomainConstraint([columns[i % cols_num]['area'] if index * cols_num <= i < (index + 1) * cols_num else 0 for i in range(var_number)], block['area'], DomainConstraintType.LESS_EQUAL))
+        int_probl.add_constraint(DomainConstraint([columns[i % cols_num]['area'] if index * cols_num <= i < (index + 1) * cols_num else 0 for i in range(var_number)], block['area'], DomainConstraintType.LESS_EQUAL))
 
     # minim 
     for index, block in enumerate(blocks):
-        constraints.append(DomainConstraint([1 if index * cols_num <= i < (index + 1) * cols_num else 0 for i in range(var_number)], block['min_number'], DomainConstraintType.LESS_EQUAL))
+        int_probl.add_constraint(DomainConstraint([1 if index * cols_num <= i < (index + 1) * cols_num else 0 for i in range(var_number)], block['min_number'], DomainConstraintType.LESS_EQUAL))
 
     # price 
-    constraints.append(DomainConstraint([columns[i % cols_num]['cost'] for i in range(var_number)], 600, DomainConstraintType.LESS_EQUAL))
+    int_probl.add_constraint(DomainConstraint([columns[i % cols_num]['cost'] for i in range(var_number)], 600, DomainConstraintType.LESS_EQUAL))
 
     # availability 
     for index, column in enumerate(columns):
-        constraints.append(DomainConstraint([1 if index % cols_num == 0 else 0 for i in range(var_number)], column['availability'], DomainConstraintType.LESS_EQUAL))
+        int_probl.add_constraint(DomainConstraint([1 if index % cols_num == 0 else 0 for i in range(var_number)], column['availability'], DomainConstraintType.LESS_EQUAL))
 
-    int_probl = DomainProblem(c, DomainOptimizationType.MAX, constraints, is_integer=True)
     ret, opt, sol = int_probl.solve()
     end_time = time.time()
 

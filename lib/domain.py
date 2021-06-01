@@ -7,9 +7,9 @@ import numpy as np
 from enum import Enum
 import json
 
-class DomainProblem: #TODO Better inline creation
+class DomainProblem:
 
-    def __init__(self, costs, optimization_type, constraints, non_negatives=None, non_positives=[], is_integer=False):
+    def __init__(self, costs, optimization_type, constraints=[], non_negatives=None, non_positives=[], is_integer=False):
         if non_negatives is None:
             non_negatives = np.arange(costs.size)
 
@@ -55,6 +55,9 @@ class DomainProblem: #TODO Better inline creation
             'MIN': DomainOptimizationType.MIN,
             'MAX': DomainOptimizationType.MAX
         }[problem['objective']['optimization']], constraints, problem['non-negatives'], problem.get('non-positives', []), problem.get('integer', False))
+
+    def add_constraint(self, c):
+        self.constraints.append(c)
 
     def get_constraint_array(self):
         if self._constraint_array is None:
