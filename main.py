@@ -24,7 +24,7 @@ def run_example(blocks_filename, columns_filename, image_filename=None, plot=Fal
     blocks_num = len(blocks)
     cols_num = len(columns)
     var_number = blocks_num * cols_num
-    c = np.array([columns[i % 3]['power'] for i in range(var_number)])
+    c = np.array([columns[i % cols_num]['power'] for i in range(var_number)])
 
     int_probl = DomainProblem(c, DomainOptimizationType.MAX, is_integer=True)
 
@@ -34,10 +34,10 @@ def run_example(blocks_filename, columns_filename, image_filename=None, plot=Fal
 
     # minim 
     for index, block in enumerate(blocks):
-        int_probl.add_constraint(DomainConstraint([1 if index * cols_num <= i < (index + 1) * cols_num else 0 for i in range(var_number)], block['min_number'], DomainConstraintType.LESS_EQUAL))
+        int_probl.add_constraint(DomainConstraint([1 if index * cols_num <= i < (index + 1) * cols_num else 0 for i in range(var_number)], block['min_number'], DomainConstraintType.GREAT_EQUAL))
 
     # price 
-    int_probl.add_constraint(DomainConstraint([columns[i % cols_num]['cost'] for i in range(var_number)], 600, DomainConstraintType.LESS_EQUAL))
+    int_probl.add_constraint(DomainConstraint([columns[i % cols_num]['cost'] for i in range(var_number)], 2000, DomainConstraintType.LESS_EQUAL))
 
     # availability 
     for index, column in enumerate(columns):
@@ -45,6 +45,8 @@ def run_example(blocks_filename, columns_filename, image_filename=None, plot=Fal
 
     ret, opt, sol = int_probl.solve()
     end_time = time.time()
+
+    print(opt, sol)
 
     if plot:
         plot_map(image_filename, blocks, columns, sol)

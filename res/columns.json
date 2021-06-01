@@ -4,20 +4,20 @@
         "power": 100,
         "area": 1,
         "cost": 10,
-        "availability": 15
+        "availability": 185
     },
     {
         "name": "C2",
         "power": 200,
         "area": 2,
         "cost": 15,
-        "availability": 7
+        "availability": 89
     },
     {
         "name": "C3",
         "power": 300,
         "area": 3,
         "cost": 25,
-        "availability": 8
+        "availability": 80
     }
 ]
