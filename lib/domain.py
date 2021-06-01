@@ -72,8 +72,9 @@ class DomainProblem:
     def get_standard_form(self):
         logger.write("\nTurning the problem into standard form")
         Ac = np.r_[[self.costs], self.get_constraint_array()]
-        var_chg_map = {i: [{'var': i, 'coeff': 1 if self.costs[i]!= 0 else 0 }] for i in range(self.costs.size)}          #TODO check
-        #var_chg_map = {i: [{'var': i, 'coeff': 1 }] for i in range(self.costs.size)}
+
+        # Sets the variable-change map only if the variable is present in the objective function
+        var_chg_map = {i: [{'var': i, 'coeff': 1 if self.costs[i] != 0 else 0}] for i in range(self.costs.size)}
         rows, cols = Ac.shape
 
         # 1. Change objective function to minimization
