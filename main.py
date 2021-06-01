@@ -37,18 +37,16 @@ def run_example(blocks_filename, columns_filename, image_filename=None, plot=Fal
         int_probl.add_constraint(DomainConstraint([1 if index * cols_num <= i < (index + 1) * cols_num else 0 for i in range(var_number)], block['min_number'], DomainConstraintType.GREAT_EQUAL))
 
     # price 
-    budget = 62000
+    budget = 100000
     int_probl.add_constraint(DomainConstraint([columns[i % cols_num]['cost'] for i in range(var_number)], budget, DomainConstraintType.LESS_EQUAL))
 
     # availability 
     for index, column in enumerate(columns):
-        int_probl.add_constraint(DomainConstraint([1 if index % cols_num == 0 else 0 for i in range(var_number)], column['availability'], DomainConstraintType.LESS_EQUAL))
+        int_probl.add_constraint(DomainConstraint([1 if i % cols_num == index else 0 for i in range(var_number)], column['availability'], DomainConstraintType.LESS_EQUAL))
 
     ret, opt, sol = int_probl.solve()
     end_time = time.time()
-
-    print(opt, sol)
-
+    
     if plot:
         plot_map(image_filename, blocks, columns, sol)
 
