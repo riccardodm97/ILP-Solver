@@ -8,10 +8,6 @@ from lib.domain import DomainConstraint, DomainProblem
 from argparse import ArgumentParser
 import time
 
-image_path = "res/rome2.png"
-blocks_data_path = "res/rome2.json"
-columns_data_path = "res/columns.json"
-
 def run_map_example(blocks_filename, columns_filename, image_filename=None, plot=False, log_target=LogTarget.NONE, log_verbose=LogVerbosity.LOW):
     start_time = time.time()
     logger.set_target(log_target)
