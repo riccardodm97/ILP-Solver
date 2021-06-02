@@ -6,26 +6,12 @@ import numpy as np
 
 class TestDomainProblem(TestBase):
 
-    def test_static_from_matrix(self):
-        #(matrix, type=DomainOptimizationType.MIN, non_negatives=[], non_positives=[], is_integer=False)
-        pass #TODO
-
-    def test_static_from_abc(self):
-        #(A, b, c, type=DomainOptimizationType.MIN, non_negatives=[], non_positives=[], is_integer=False)
-        pass #TODO
-
     def test_static_from_json(self):
         for p in self._get_problem_files():
             try:
                 DomainProblem.from_json(p)
             except Exception:
                 self.fail("deserialize_problem raised Exception on " + p)
-
-    def test_get_constraint_array(self):
-        pass #TODO
-
-    def test_get_constants_array(self):
-        pass #TODO
 
     def test_get_standard_form(self):
         for p, solution in self._load_problems('decimal'):
@@ -48,6 +34,3 @@ class TestDomainProblem(TestBase):
                 opt, sol = p.get_problem_sol(std_opt, std_sol, chg)
                 self.assertEqual(opt, self._fract_to_dec(solution['optimum']))
                 self.assertTrue((sol == self._fract_to_dec(np.array(solution['values']))).all())
-
-    def test_solve(self):
-        pass #TODO

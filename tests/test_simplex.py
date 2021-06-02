@@ -10,15 +10,6 @@ from lib.domain import DomainProblem
 
 class TestBaseProblem(TestBase):
 
-    def test_getters(self):
-        pass #TODO (+ get_Aj)
-
-    def test_setters(self):
-        pass #TODO
-
-    def test_check_basis(self):
-        pass #TODO
-
     def test_find_initial_basis(self):
         ps = [
             self._create_problem((4,4), A=[
@@ -54,9 +45,6 @@ class TestBaseProblem(TestBase):
 
             if p.in_basis.shape == sol.shape:
                 self.assertTrue((p.in_basis == sol).all())
-
-    def test_init_carry(self):
-        pass #TODO
 
     def test_compute_out_of_base(self):
         ps = [
@@ -94,46 +82,8 @@ class TestBaseProblem(TestBase):
 
             if p.out_basis.shape == sol.shape:
                 self.assertTrue((p.out_basis == sol).all())
-        
-    def test_swap_vars(self):
-        pass #TODO
-
-    def test_determine_entering_var(self):
-        # p.determine_entering_var()
-        pass #TODO
-
-    def test_determine_exiting_var(self):
-        # p.determine_exiting_var(ent_var)
-        pass #TODO
-
-    def test_update_carry(self):
-        pass #TODO
-
-class TestArtificialSimplexProblem(TestBase):
-    def test_find_initial_basis(self):
-        pass #TODO
-
-    def test_check_basis(self):
-        pass #TODO
-
-    def test_substitute_artificial_vars(self):
-        pass #TODO
 
 class TestBaseFunctions(TestBase):
-
-    def test_define_artificial_problem(self):
-        for i in range(10):
-            p = self._create_problem((4,4))
-            p.find_initial_basis()
-            p.set_inverse_matrix()
-            c,A,b,art_vars = define_artificial_problem(p)
-
-            #create object 
-            ap = SimplexArtificialProblem(c,A,b,art_vars,p.in_basis.copy())
-            
-            #self._test_simplex_problem_correctness(ap)
-            #self.assertFalse((ap.in_basis == -1).any())
-            # TODO ap should have more coefficients than
     
     def test_domain_problem_solve(self):
         for dp, solution in self._load_problems('decimal'):
@@ -151,11 +101,3 @@ class TestBaseFunctions(TestBase):
 
                 self.assertEqual(opt, self._fract_to_dec(solution['optimum']))
                 
-    def test_from_p1_to_p2(self):
-        pass #TODO
-          
-    def test_phase1(self):
-        pass #TODO
-
-    def test_phase2(self):
-        pass #TODO

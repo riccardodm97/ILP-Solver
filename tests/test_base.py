@@ -47,7 +47,6 @@ class TestBase(unittest.TestCase):
     def _test_carry_correctness(self, p):
         self.assertTrue(isinstance(p.carry_matrix, np.ndarray))
         self.assertTrue(isinstance(p.get_y(), np.ndarray))
-        #self.assertTrue(isinstance(carry.z, np.ndarray)) TODO: Check if scalar
         self.assertTrue(isinstance(p.get_inverse_matrix(), np.ndarray))
         self.assertTrue(isinstance(p.get_xb(), np.ndarray))
 
