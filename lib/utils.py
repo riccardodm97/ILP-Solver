@@ -9,7 +9,6 @@ class ProblemSolution(Enum):
     FINITE = 1
     UNLIMITED = 2
     IMPOSSIBLE = 3
-    #TODO: MAX_ITERATIONS_REACHED = 4 ?
 
 class DomainConstraintType(Enum):
     LESS_EQUAL = 1

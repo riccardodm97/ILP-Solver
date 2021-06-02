@@ -108,7 +108,7 @@ class DomainProblem:
                 
                 if constraint.type == DomainConstraintType.LESS_EQUAL:
                     Ac[index + 1,-1] = 1
-                elif constraint.type == DomainConstraintType.GREAT_EQUAL: #TODO: Check if sign inversion is needed
+                elif constraint.type == DomainConstraintType.GREAT_EQUAL:
                     Ac[index + 1,-1] = -1
 
         matrix = np.c_[Ac, np.insert(self.get_constants_array(), 0, 0)]

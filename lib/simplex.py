@@ -5,8 +5,6 @@ import numpy as np
 
 class SimplexProblem:
     
-    #TODO: Add maximum iteration limit?
-
     def __init__(self, obj_func_coefficent, coefficent_matrix, constant_terms):
         self.c = np.array(obj_func_coefficent)
         self.A = np.array(coefficent_matrix)
