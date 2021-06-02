@@ -59,7 +59,6 @@ def run_toy_example(example_filename, plot=False, log_target=LogTarget.NONE, log
     logger.set_verbosity(log_verbose)
 
     int_probl = DomainProblem.from_json(example_filename)
-    int_probl.is_integer = True
     ret, opt, sol = int_probl.solve()
     print("\nsolution : ",opt, sol)
     end_time = time.time()
@@ -72,7 +71,7 @@ if __name__ == "__main__":
     parser.add_argument("-L", "--logging", dest="logging", help="Defines logging mode", default="none", choices=['none', 'console', 'file'])
     parser.add_argument('-V', '--verbosity', dest="verbosity", help="Defines verbosity level", default="low", choices=['low', 'high'])
     parser.add_argument('-P', '--plot', dest="plot", help="If specified plots the resulting image at the end of execution", default=False, action='store_true')
-    parser.add_argument('-R', '--run', dest="run", help="Chooses the example to run", choices=['toy', 'map'])
+    parser.add_argument('-R', '--run', dest="run", help="Chooses the example to run", default="linear", choices=['linear', 'integer', 'map'])
     args = parser.parse_args()
 
     log_target = {
@@ -88,7 +87,9 @@ if __name__ == "__main__":
 
     if args.run == "map":
         execution_time = run_map_example("res/rome.json", "res/columns.json", "res/rome.png", plot=args.plot, log_target=log_target, log_verbose=log_verbose)
-    elif args.run == "toy":
-        execution_time = run_toy_example("res/example.json", plot=args.plot, log_target=log_target, log_verbose=log_verbose)
+    elif args.run == "linear":
+        execution_time = run_toy_example("res/linear_example.json", plot=args.plot, log_target=log_target, log_verbose=log_verbose)
+    elif args.run == "integer":
+        execution_time = run_toy_example("res/integer_example.json", plot=args.plot, log_target=log_target, log_verbose=log_verbose)
 
     print("Execution finished in " + str(execution_time) + "s")
