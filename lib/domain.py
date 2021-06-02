@@ -1,10 +1,9 @@
 from fractions import Fraction
 from lib import logger
 from lib.bb import bb_algorithm
-from lib.simplex import SimplexProblem, phase1, phase2, simplex_algorithm
+from lib.simplex import simplex_algorithm
 from lib.utils import DomainConstraintType, DomainOptimizationType, ProblemSolution
 import numpy as np
-from enum import Enum
 import json
 
 class DomainProblem:

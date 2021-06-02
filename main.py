@@ -61,7 +61,7 @@ def run_toy_example(example_filename, plot=False, log_target=LogTarget.NONE, log
     int_probl = DomainProblem.from_json(example_filename)
     int_probl.is_integer = True
     ret, opt, sol = int_probl.solve()
-    print(opt, sol)
+    print("\nsolution : ",opt, sol)
     end_time = time.time()
 
     return end_time - start_time

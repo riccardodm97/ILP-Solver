@@ -18,7 +18,6 @@ class SimplexProblem:
     def get_y(self):
         return self.carry_matrix[0,:-1]
     def get_z(self):
-        #TODO: Return scalar?
         return self.carry_matrix[0:1,-1] 
     def get_inverse_matrix(self):
         return self.carry_matrix[1:,:-1]  
@@ -52,7 +51,7 @@ class SimplexProblem:
         self.in_basis = np.array(base_indexes) 
     
     def init_carry(self):
-        self.set_xb(np.dot(self.get_inverse_matrix(),self.b))                #TODO Sometimes useless computation
+        self.set_xb(np.dot(self.get_inverse_matrix(),self.b))                
         self.set_y(np.dot(-self.c[self.in_basis],self.get_inverse_matrix()))
         self.set_z(np.dot(self.get_y(),self.b))
     
@@ -80,7 +79,7 @@ class SimplexProblem:
         if (Aj<=0).all() :                            #unlimited problem            
             return None,None 
 
-        positives = np.where(Aj > 0, np.divide(self.get_xb(), Aj, out=np.zeros_like(Aj), where=Aj!=0), np.inf)
+        positives = np.where(Aj > 0, np.divide(self.get_xb(), Aj, out=np.zeros_like(Aj), where=(Aj!=0)), np.inf)
         h = np.where(positives == positives.min())[0]
 
         out_index = h[self.in_basis[h].argmin()]     #BLAND rule
@@ -183,7 +182,7 @@ def simplex_algorithm(c, A, b):
         solution = np.zeros(problem.c.size)
         solution[problem.in_basis] = problem.get_xb()
         opt = round(-problem.get_z()[0], Parameters.DECIMAL_PRECISION)
-        return ret_type, opt, np.around(solution, Parameters.DECIMAL_PRECISION)    # TODO: Check if makes sense
+        return ret_type, opt, np.around(solution, Parameters.DECIMAL_PRECISION)    
     else:
         return ret_type, None, None
 
@@ -226,7 +225,7 @@ def phase1(p : SimplexProblem):
         cost,ent_var = p1.determine_entering_var()
         lin_dep_rows = None
         if cost == None:            #no negative cost found
-            if round(p1.get_z()[0], Parameters.DECIMAL_PRECISION) != 0 :                                                  #TODO: what if <0 ? 
+            if round(p1.get_z()[0], Parameters.DECIMAL_PRECISION) != 0 :                                                  
                 return ProblemSolution.IMPOSSIBLE
             elif p1.check_basis():   
                 lin_dep_rows = p1.substitute_artificial_vars()   
