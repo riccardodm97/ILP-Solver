@@ -1,0 +1,26 @@
+{
+    "objective": {
+        "costs": [5, 8],
+        "optimization": "MAX"
+    },
+    "constraints": [
+        {
+            "coefficients": [1, 1],
+            "constant": 6,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [5, 9],
+            "constant": 45,
+            "type": "LEQ"
+        }
+    ],
+    "non-negatives": [0, 1],
+    "non-positives": [],
+    "integer": true,
+    "solution": {
+        "values": [0, 5],
+        "optimum": 40,
+        "type": 1
+    }
+}

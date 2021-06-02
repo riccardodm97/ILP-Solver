@@ -64,7 +64,7 @@
     "non-positives": [],
     "integer": true,
     "solution": {
-        "values": [48,  52, 0, 406, 296,  98,  46, 252, 202],
+        "values": [100, 0, 0, 300, 400, 100, 100, 200, 200],
         "optimum": 14900,
         "type": 1
     }
