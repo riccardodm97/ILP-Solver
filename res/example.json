@@ -1,0 +1,25 @@
+{
+    "objective": {
+        "costs": [2, -3, 1, -4, 1],
+        "optimization": "MIN"
+    },
+    "constraints": [
+        {
+            "coefficients": [1, 1, 1, -1, 0],
+            "constant": 4,
+            "type": "EQ"
+        },
+        {
+            "coefficients": [2, 0, -1, 1, 1],
+            "constant": 2,
+            "type": "EQ"
+        },
+        {
+            "coefficients": [3, 0, 1, 2, 0],
+            "constant": 1,
+            "type": "LEQ"
+        }
+    ],
+    "non-negatives": [0, 1, 2, 3, 4],
+    "integer": true
+}

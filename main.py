@@ -12,10 +12,12 @@ image_path = "res/rome2.png"
 blocks_data_path = "res/rome2.json"
 columns_data_path = "res/columns.json"
 
-def run_example(blocks_filename, columns_filename, image_filename=None, plot=False, log_target=LogTarget.NONE, log_verbose=LogVerbosity.LOW):
+def run_map_example(blocks_filename, columns_filename, image_filename=None, plot=False, log_target=LogTarget.NONE, log_verbose=LogVerbosity.LOW):
     start_time = time.time()
     logger.set_target(log_target)
     logger.set_verbosity(log_verbose)
+
+    budget = 100000
 
     with open(blocks_filename) as json_blocks, open(columns_filename) as json_columns:
         blocks = json.load(json_blocks)
@@ -37,7 +39,6 @@ def run_example(blocks_filename, columns_filename, image_filename=None, plot=Fal
         int_probl.add_constraint(DomainConstraint([1 if index * cols_num <= i < (index + 1) * cols_num else 0 for i in range(var_number)], block['min_number'], DomainConstraintType.GREAT_EQUAL))
 
     # price 
-    budget = 100000
     int_probl.add_constraint(DomainConstraint([columns[i % cols_num]['cost'] for i in range(var_number)], budget, DomainConstraintType.LESS_EQUAL))
 
     # availability 
@@ -52,26 +53,42 @@ def run_example(blocks_filename, columns_filename, image_filename=None, plot=Fal
 
     return end_time - start_time
 
+def run_toy_example(example_filename, plot=False, log_target=LogTarget.NONE, log_verbose=LogVerbosity.LOW):
+    start_time = time.time()
+    logger.set_target(log_target)
+    logger.set_verbosity(log_verbose)
+
+    int_probl = DomainProblem.from_json(example_filename)
+    int_probl.is_integer = True
+    ret, opt, sol = int_probl.solve()
+    print(opt, sol)
+    end_time = time.time()
+
+    return end_time - start_time
+
+
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("-B", "--blocks", dest="blocks", help="Path of the blocks definition file", default="res/rome.json")
-    parser.add_argument("-C", "--columns", dest="columns", help="Path of the columns definition file", default="res/columns.json")
-    parser.add_argument("-I", "--image", dest="image", help="Path of the blocks map image", default=None)
     parser.add_argument("-L", "--logging", dest="logging", help="Defines logging mode", default="none", choices=['none', 'console', 'file'])
     parser.add_argument('-V', '--verbosity', dest="verbosity", help="Defines verbosity level", default="low", choices=['low', 'high'])
     parser.add_argument('-P', '--plot', dest="plot", help="If specified plots the resulting image at the end of execution", default=False, action='store_true')
+    parser.add_argument('-R', '--run', dest="run", help="Chooses the example to run", choices=['toy', 'map'])
     args = parser.parse_args()
 
-    execution_time = run_example(args.blocks, args.columns, args.image, 
-        plot=args.plot, 
-        log_target={
-            "none": LogTarget.NONE,
-            "console": LogTarget.CONSOLE,
-            "file": LogTarget.FILE,
-        }[args.logging], 
-        log_verbose={
-            "low": LogVerbosity.LOW,
-            "high": LogVerbosity.HIGH,
-        }[args.verbosity])
+    log_target = {
+        "none": LogTarget.NONE,
+        "console": LogTarget.CONSOLE,
+        "file": LogTarget.FILE,
+    }[args.logging]
+
+    log_verbose = {
+        "low": LogVerbosity.LOW,
+        "high": LogVerbosity.HIGH,
+    }[args.verbosity]
+
+    if args.run == "map":
+        execution_time = run_map_example("res/rome.json", "res/columns.json", "res/rome.png", plot=args.plot, log_target=log_target, log_verbose=log_verbose)
+    elif args.run == "toy":
+        execution_time = run_toy_example("res/example.json", plot=args.plot, log_target=log_target, log_verbose=log_verbose)
 
     print("Execution finished in " + str(execution_time) + "s")
