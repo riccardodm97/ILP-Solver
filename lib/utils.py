@@ -27,7 +27,7 @@ def plot_map(image_path, blocks, columns, sols):
     cols_num = len(columns)
     vert_offset = 2 * h / (cols_num * 2 + 1)
     img = plt.imread(image_path)
-    fig, ax = plt.subplots(1)
+    fig, ax = plt.subplots(1, 1, figsize=(12, 10))
     ax.set_aspect('equal')
     ax.imshow(img)
 
