@@ -1,0 +1,20 @@
+{
+    "objective": {
+        "costs": [100, 150],
+        "optimization": "MAX"
+    },
+    "constraints": [
+        {
+            "coefficients": [8000, 4000],
+            "constant": 40000,
+            "type": "LEQ"
+        },
+        {
+            "coefficients": [15, 30],
+            "constant": 200,
+            "type": "LEQ"
+        }  
+    ],
+    "non-negatives": [0, 1],
+    "integer": true
+}
