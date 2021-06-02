@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
 class Parameters:
-    DECIMAL_PRECISION = 13
+    DECIMAL_PRECISION = 8
 
 class ProblemSolution(Enum):
     FINITE = 1
