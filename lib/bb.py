@@ -153,6 +153,8 @@ def bb_algorithm(std_problem, var_chg_map, optimization_type):
     tree = BBTree(std_problem, var_chg_map, optimization_type)
     ret, best_node = tree.solve()
 
+    #print(tree.generated_nodes)
+
     if ret is ProblemSolution.FINITE:
         return ret, best_node.opt, best_node.sol
     else: 
