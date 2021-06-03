@@ -50,6 +50,7 @@ class SortedList():
     
     def __init__(self, items=[]) -> None:
         self._list = list(items)
+        self._list.sort()
         
     def add(self, item):
         bisect.insort(self._list,item)
@@ -57,9 +58,14 @@ class SortedList():
         # self._list.append(item)
         # self._list.sort()
 
-    
     def pop(self, n=0):
         return self._list.pop(n)
 
     def __bool__(self):
         return len(self._list) > 0
+    
+    def __str__(self):
+        return str(self._list)
+    
+    def __repr__(self):
+        return repr(self._list)
