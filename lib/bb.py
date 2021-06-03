@@ -7,8 +7,7 @@ from typing import Tuple
 from lib.utils import Parameters, ProblemSolution, DomainOptimizationType
 from lib.simplex import simplex_algorithm
 
-# from lib.utils import SortedList
-from sortedcontainers import SortedList
+from lib.utils import SortedList
 
 class BBNode:
     def __init__(self, std_problem, variables, coefficients, val, slack_coeff, var_chg_map, node_name, opt_type: DomainOptimizationType):
@@ -153,8 +152,6 @@ def bb_algorithm(std_problem, var_chg_map, optimization_type):
     logger.write("\nStarting Branch and Bound algorithm\n")
     tree = BBTree(std_problem, var_chg_map, optimization_type)
     ret, best_node = tree.solve()
-
-    #print(tree.generated_nodes)
 
     if ret is ProblemSolution.FINITE:
         return ret, best_node.opt, best_node.sol

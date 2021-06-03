@@ -52,8 +52,10 @@ class SortedList():
         self._list = list(items)
         
     def add(self, item):
-        self._list.append(item)
-        self._list.sort()
+        bisect.insort(self._list,item)
+
+        # self._list.append(item)
+        # self._list.sort()
 
     
     def pop(self, n=0):

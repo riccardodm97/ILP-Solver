@@ -3,7 +3,7 @@ from lib import logger
 from lib.logger import LogTarget, LogVerbosity
 
 import numpy as np
-from lib.utils import DomainConstraintType, DomainOptimizationType, plot_map
+from lib.utils import DomainConstraintType, DomainOptimizationType, ProblemSolution, plot_map
 from lib.domain import DomainConstraint, DomainProblem
 from argparse import ArgumentParser
 import time
@@ -46,6 +46,9 @@ def run_map_example(blocks_filename, columns_filename, image_filename=None, plot
     
     if plot:
         plot_map(image_filename, blocks, columns, sol)
+    
+    if ret is ProblemSolution.FINITE: 
+        print("\nSolution: the variables values are", sol, "with optimum value", opt)
 
     return end_time - start_time
 
@@ -56,9 +59,12 @@ def run_toy_example(example_filename, plot=False, log_target=LogTarget.NONE, log
 
     int_probl = DomainProblem.from_json(example_filename)
     ret, opt, sol = int_probl.solve()
-    print("\nsolution : ",opt, sol)
+
     end_time = time.time()
 
+    if ret is ProblemSolution.FINITE: 
+        print("\nSolution: the variables values are", sol, "with optimum value", opt)
+    
     return end_time - start_time
 
 
