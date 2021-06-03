@@ -110,7 +110,7 @@ class BBTree:
 
     def branch(self, node : BBNode):
         f = node.sol - np.trunc(node.sol)
-        idx=np.argmax(np.minimum(f, 1-f))
+        idx = np.argmax(np.minimum(f, 1-f))
         val = node.sol[idx]
 
         variables = [d['var'] for d in self.var_chg_map[idx]]
