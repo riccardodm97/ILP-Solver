@@ -1,6 +1,7 @@
 from enum import Enum
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
+import bisect
 
 class Parameters:
     DECIMAL_PRECISION = 8
@@ -43,3 +44,20 @@ def plot_map(image_path, blocks, columns, sols):
             offset += vert_offset
             
     plt.show()
+
+
+class SortedList():
+    
+    def __init__(self, items=[]) -> None:
+        self._list = list(items)
+        
+    def add(self, item):
+        self._list.append(item)
+        self._list.sort()
+
+    
+    def pop(self, n=0):
+        return self._list.pop(n)
+
+    def __bool__(self):
+        return len(self._list) > 0

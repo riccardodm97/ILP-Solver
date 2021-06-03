@@ -7,6 +7,7 @@ from typing import Tuple
 from lib.utils import Parameters, ProblemSolution, DomainOptimizationType
 from lib.simplex import simplex_algorithm
 
+# from lib.utils import SortedList
 from sortedcontainers import SortedList
 
 class BBNode:
