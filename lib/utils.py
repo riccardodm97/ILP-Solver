@@ -65,7 +65,7 @@ class SortedList():
         return len(self._list) > 0
     
     def __str__(self):
-        return str(self._list)
+        return "SortedList("+str(self._list)+")"
     
     def __repr__(self):
-        return repr(self._list)
+        return "SorteListd("+str(self._list)+")"
