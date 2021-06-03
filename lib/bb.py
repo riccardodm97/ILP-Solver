@@ -109,7 +109,8 @@ class BBTree:
         return node.opt <= self.best_node.opt if self.optimization_type is DomainOptimizationType.MAX else node.opt >= self.best_node.opt 
 
     def branch(self, node : BBNode):
-        idx=np.argmax(node.sol-np.trunc(node.sol))
+        f = node.sol - np.trunc(node.sol)
+        idx=np.argmax(np.minimum(f, 1-f))
         val = node.sol[idx]
 
         variables = [d['var'] for d in self.var_chg_map[idx]]
