@@ -16,10 +16,10 @@ The problem can be created either by instanciating `DomainProblem` and adding co
 
 ### How to run
 
-python main.py [-L/--logging LOGGING] [-v/--verbosity VERBOSITY] [-P/--plot] [-R/--run RUN]
+`python main.py [-L/--logging LOGGING] [-v/--verbosity VERBOSITY] [-P/--plot] [-R/--run RUN]`
 
---logging: Defines logging mode [`file`, `console`, `none`]
---verbosity: Level of verbosity of logs [`low`, high`]
---plot: If specified plots the resulting image at the end of execution (when running map)
---run: Chooses the example to run [`linear`, `integer`, `map`]
+- `--logging: Defines logging mode ["file", "console", "none"]`
+- `--verbosity: Level of verbosity of logs ["low", "high"]`
+- `--plot: If specified plots the resulting image at the end of execution (when running map)`
+- `--run: Chooses the example to run ["linear", "integer", "map"]`
  
